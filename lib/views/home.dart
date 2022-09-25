@@ -144,11 +144,7 @@ class _HomeState extends State<Home> {
                           decoration: InputDecoration(
                             enabledBorder: InputBorder.none,
                             focusedBorder: InputBorder.none,
-                            hintText: onBarberShop
-                                ? "Search For Barbershop"
-                                : onSaloonShop
-                                ? "Search For Hairsalon"
-                                : "Search For Spa",
+                            hintText: "Search for Service",
                             prefixIcon: Icon(Icons.search),
                           ),
                         ),

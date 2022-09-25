@@ -258,14 +258,21 @@ class _PaymentState extends State<Payment> {
                                     currentShopIndex,
                                     snapshot.data[0]['$currentShopIndex']['members-amount']+1,
                                     snapshot.data[0]['$currentShopIndex']['memberships']['$currentMembershipIndex']['name'],
-                                    snapshot.data[1]['$userLoggedInIndex']['full-name']
+                                    snapshot.data[1]['$userLoggedInIndex']['full-name'],
+                                    snapshot.data[1]['$userLoggedInIndex']['email'],
+                                    DateTime.now().day,
+                                    DateTime.now().month,
+                                    DateTime.now().year,
                                 );
 
                                 await databaseService.addUserMembership(
                                     userLoggedInIndex,
                                     snapshot.data[1]['$userLoggedInIndex']['membership-amount']+1,
                                     snapshot.data[0]['$currentShopIndex']['memberships']['$currentMembershipIndex']['name'],
-                                    currentShop
+                                    currentShop,
+                                    DateTime.now().day,
+                                    DateTime.now().month,
+                                    DateTime.now().year,
                                 );
                               }
 
