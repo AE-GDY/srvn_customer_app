@@ -2,6 +2,8 @@ import 'package:booking_app/models/barbershop.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'models/credit_card.dart';
+
 
 
 // AFTER
@@ -175,3 +177,7 @@ String globalStartTime = "";
 String globalEndTime = "";
 
 String typeOfItemSelected = "Services";
+
+List<CreditCard> savedCreditCards = [];
+
+

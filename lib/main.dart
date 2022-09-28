@@ -1,3 +1,4 @@
+import 'package:booking_app/views/add_credit_card.dart';
 import 'package:booking_app/views/appointments.dart';
 import 'package:booking_app/views/bookedappointment.dart';
 import 'package:booking_app/views/bookingscreen.dart';
@@ -5,12 +6,14 @@ import 'package:booking_app/views/currentshopview.dart';
 import 'package:booking_app/views/explore.dart';
 import 'package:booking_app/views/home.dart';
 import 'package:booking_app/views/login.dart';
+import 'package:booking_app/views/payment-methods.dart';
 import 'package:booking_app/views/payment.dart';
 import 'package:booking_app/views/profile.dart';
 import 'package:booking_app/views/shoplist.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 
 
 
@@ -30,9 +33,7 @@ class MyApp extends StatelessWidget {
         title: 'Flutter Barbershop',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          textTheme: GoogleFonts.poppinsTextTheme(
-            Theme.of(context).textTheme,
-          ),
+          textTheme:  GoogleFonts.latoTextTheme(),
         ),
         initialRoute: '/',
         routes: <String, WidgetBuilder>{
@@ -46,6 +47,8 @@ class MyApp extends StatelessWidget {
           '/explore': (context) => Explore(),
           '/profile': (context) => Profile(),
           '/payment': (context) => Payment(),
+          '/payment-methods': (context) => PaymentMethods(),
+          '/add-card': (context) => AddCreditCard(),
         }
     );
   }

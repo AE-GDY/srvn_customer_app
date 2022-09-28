@@ -177,9 +177,9 @@ class _shopListState extends State<shopList> {
   Widget build(BuildContext context) {
     onShopList = true;
     return Scaffold(
-      backgroundColor: Colors.deepPurple[50],
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.deepPurple[50],
         elevation: 0.0,
         automaticallyImplyLeading: true,
         leading: FutureBuilder(
@@ -275,93 +275,89 @@ class _shopListState extends State<shopList> {
                       else{
                         return Padding(
                           padding: EdgeInsets.all(0),
-                          child: MaterialButton(
-                            onPressed: () {
+                          child: Column(
+                            children: [
+                              MaterialButton(
+                                onPressed: () {
 
 
-                              onShopList = false;
-                              currentShop = snapshot.data['${index-1}']['shop-name'];
-                              currentAddress = snapshot.data['${index-1}']['shop-address'];
-                              currentShopIndex = index-1;
+                                  onShopList = false;
+                                  currentShop = snapshot.data['${index-1}']['shop-name'];
+                                  currentAddress = snapshot.data['${index-1}']['shop-address'];
+                                  currentShopIndex = index-1;
 
-                              Navigator.pushNamed(context, '/currentshop');
+                                  Navigator.pushNamed(context, '/currentshop');
 
-                            },
-                            child: Stack(
-                              //alignment: Alignment.bottomCenter,
-                              children: [
-                                Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  elevation: 5.0,
-                                  child: Container(
-                                    height: 180,
-                                    width: MediaQuery.of(context).size.width,
-                                   // margin: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(15),
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  left: 20,
-                                  top: 20,
-                                  child: Container(
-                                    child: Text(snapshot.data['${index-1}']['shop-name'],
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),),
-                                  ),
-                                ),
-                                Positioned(
-                                  left: 20,
-                                  top: 70,
-                                  child: Container(
-                                    child: Text(snapshot.data['${index-1}']['shop-address'],
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                      ),),
-                                  ),
-                                ),
+                                },
+                                child: Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  height: 150,
 
-                                Positioned(
-                                  top: -16,
-                                  right: 3,
                                   child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(30.0),
+                                    borderRadius: BorderRadius.circular(10),
                                     child: Image.network(
                                       snapshot.data['${index-1}']['images']['${0}'],
                                       alignment: Alignment.center,
                                       fit: BoxFit.fitWidth,
-                                      height: 160,
-                                      width: 180,
+
                                     ),
                                   ),
                                 ),
+                              ),
 
+                              SizedBox(height: 5,),
 
-                                Positioned(
-                                  left: 20,
-                                  top: 110,
-                                  child: Column(
-                                    children: [
-                                      Container(
-                                        height: 30,
-                                        child: createRating(snapshot.data['${index-1}']['reviews-rating']),
-                                      ),
-                                      SizedBox(height: 0,),
-                                      snapshot.data['${index-1}']['reviews-amount'] == 0?
-                                      Text('( ${snapshot.data['${index-1}']['reviews-amount']+1} review )'):
-                                      Text('( ${snapshot.data['${index-1}']['reviews-amount']+1} reviews )'),
-                                    ],
-                                  ),
+                              Container(
+                                margin: EdgeInsets.only(left: 20,right: 20,top: 10),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          child: Text(snapshot.data['${index-1}']['shop-name'],
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                            ),),
+                                        ),
+
+                                        Container(
+                                          child: Text(snapshot.data['${index-1}']['shop-address'],
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.grey[600],
+                                            ),),
+                                        ),
+                                      ],
+                                    ),
+
+                                    Column(
+                                      children: [
+                                        Container(
+                                          height: 30,
+                                          child: createRating(snapshot.data['${index-1}']['reviews-rating']),
+                                        ),
+                                        SizedBox(height: 0,),
+                                        snapshot.data['${index-1}']['reviews-amount'] == 0?
+                                        Text('( ${snapshot.data['${index-1}']['reviews-amount']+1} review )'):
+                                        Text('( ${snapshot.data['${index-1}']['reviews-amount']+1} reviews )'),
+                                      ],
+                                    ),
+
+                                  ],
                                 ),
+                              ),
 
-                              ],
-                            ),
+
+
+
+
+
+                            ],
                           ),
                         );
                       }
@@ -377,7 +373,7 @@ class _shopListState extends State<shopList> {
   }
 
 
-  Widget createRating(double currentRating){
+  Widget createRating(dynamic currentRating){
 
     return  ListView.builder(
       shrinkWrap: true,

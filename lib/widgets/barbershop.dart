@@ -4,9 +4,18 @@ import 'package:flutter/material.dart';
 
 
 class shopCard extends StatefulWidget {
-  final dynamic barbershop;
-  final barberIndex;
-  shopCard({required this.barbershop, required this.barberIndex});
+  final String shopName;
+  final String shopAddress;
+  final String shopImageUrl;
+  final String shopRating;
+  final int shopIndex;
+  shopCard({
+    required this.shopName,
+    required this.shopAddress,
+    required this.shopImageUrl,
+    required this.shopRating,
+    required this.shopIndex,
+  });
 
   @override
   _shopCardState createState() => _shopCardState();
@@ -18,7 +27,7 @@ class _shopCardState extends State<shopCard> {
     return Container(
       width: 200.0,
       // color: Colors.red,
-      margin: EdgeInsets.only(left: 18.0),
+      margin: EdgeInsets.only(left: 15.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -29,7 +38,7 @@ class _shopCardState extends State<shopCard> {
               child: TextButton(
                 onPressed: (){
                   setState(() {
-                    currentShopIndex = widget.barberIndex;
+                    currentShopIndex = widget.shopIndex;
                     onBarberShop = true;
                   });
                   Navigator.pushNamed(context, '/currentshop');
@@ -38,11 +47,13 @@ class _shopCardState extends State<shopCard> {
                 child: Container(
                   width: double.infinity,
                   height: 100.0,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(7.0),
-                    image: DecorationImage(
-                      image: AssetImage(widget.barbershop.image),
-                      fit: BoxFit.cover,
+                  child:ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.network(
+                      widget.shopImageUrl,
+                      alignment: Alignment.center,
+                      fit: BoxFit.fitWidth,
+
                     ),
                   ),
                 ),
@@ -52,25 +63,32 @@ class _shopCardState extends State<shopCard> {
 
           Row(
             children: [
-              SizedBox(
-                width: 140.0,
-                child: Text(
-                  widget.barbershop.name,
-                  overflow: TextOverflow.ellipsis,
-                  style: kTitleItem,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.shopName,
+                    overflow: TextOverflow.ellipsis,
+                    style: kTitleItem,
+                  ),
+
+                  Text(
+                      widget.shopAddress,
+                      style: kSubtitleItem
+                  ),
+                ],
               ),
+
               Spacer(),
               Icon(
                 Icons.star,
                 size: 15.0,
                 color: kYellow,
               ),
-              Text(widget.barbershop.rating, style: kTitleItem),
+              Text('${widget.shopRating}', style: kTitleItem),
             ],
           ),
-          Text(widget.barbershop.address,
-              overflow: TextOverflow.ellipsis, style: kTitleItem),
+
         ],
       ),
     );

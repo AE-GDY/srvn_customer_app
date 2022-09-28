@@ -952,6 +952,7 @@ class ServiceTile extends StatelessWidget {
                 ),
               ),
 
+              isInMembership?Container():
               isPromotion?Text('${serviceDiscount}% off',style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 15,
@@ -980,6 +981,11 @@ class ServiceTile extends StatelessWidget {
                 ),
               ),
 
+              isInMembership?Text('FREE!',style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+                color: Colors.deepOrange,
+              ),):
               isPromotion?Text(
                 '$serviceDiscountedPrice EGP',
                 style: TextStyle(
@@ -987,11 +993,7 @@ class ServiceTile extends StatelessWidget {
                   fontSize: 15,
                   color: Colors.red,
                 ),
-              ):isInMembership?Text('FREE!',style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-                color: Colors.deepOrange,
-              ),):isDiscounted?Text('${servicePrice - (servicePrice*discounts[discountedIndex])}',style: TextStyle(
+              ):isDiscounted?Text('${servicePrice - (servicePrice*discounts[discountedIndex])}',style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 15,
                 color: Colors.deepOrange,

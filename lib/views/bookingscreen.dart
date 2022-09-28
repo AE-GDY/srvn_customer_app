@@ -1,6 +1,7 @@
 import 'package:booking_app/models/barbershop.dart';
 import 'package:booking_app/services/database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:booking_app/constants.dart';
 import 'dart:ui';
@@ -36,6 +37,11 @@ class _BarberTimeState extends State<BarberTime> {
   dynamic currentDayTimings = {};
   dynamic bookingsPerSlot = {};
   int currentMinuteGap = 0;
+
+  bool paymentMethodSelected = false;
+
+
+  bool addedCreditCard = false;
 
   List<bool> passedTimeStatuses = [];
   List<bool> isBlocked = [];
@@ -147,6 +153,7 @@ class _BarberTimeState extends State<BarberTime> {
                   }
 
                   return Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       SizedBox(height: 10,),
@@ -170,13 +177,13 @@ class _BarberTimeState extends State<BarberTime> {
                           calendarStyle: CalendarStyle(
                             isTodayHighlighted: true,
                             selectedDecoration: BoxDecoration(
-                              color: Colors.blue,
+                              color: Colors.deepPurple,
                               shape: BoxShape.rectangle,
-                              // borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(10),
                             ),
 
                             todayTextStyle: TextStyle(color: Colors.black),
-                            selectedTextStyle: TextStyle(color: Colors.black),
+                            selectedTextStyle: TextStyle(color: Colors.white),
                             todayDecoration: BoxDecoration(
                               border: Border.all(
                                 color: Colors.black,
@@ -423,6 +430,13 @@ class _BarberTimeState extends State<BarberTime> {
                                   physics: ScrollPhysics(),
                                   shrinkWrap: true,
                                   itemBuilder: (context, index) {
+
+                                    print('INDEX: $index');
+
+                                    print(conflictingTimes[index]);
+                                    print('');
+
+
                                     if (conflictingTimes[index] || passedTimeStatuses[index]) {
                                       return Container();
                                     }
@@ -450,113 +464,229 @@ class _BarberTimeState extends State<BarberTime> {
 
                       ),
 
-                      SizedBox(height: 20,),
+                      SizedBox(height: 30,),
+
+
                       Container(
-                        alignment: Alignment.center,
-                        width: MediaQuery
-                            .of(context)
-                            .size
-                            .width,
-                        height: 54,
-                        margin: EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.circular(5),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0x17000000),
-                              offset: Offset(0, 15),
-                              blurRadius: 15,
-                              spreadRadius: 0,
-                            ),
-                          ],
-                        ),
-                        child: MaterialButton(
-                          onPressed: () async {
-                            startYear = timePicked.year;
-                            startMonth = timePicked.month;
-                            startDay = timePicked.day;
+                        height: MediaQuery.of(context).size.height/3,
+                        child: Card(
+                          elevation: 10.0,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
 
-                            globalYear = startYear;
-                            globalDay = startDay;
-                            globalDayWords = currentDayOfWeek;
+                              Row(
+                                children: [
+                                  Container(
+                                    margin: EdgeInsets.all(10),
+                                    child: Text('Payment Method', style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                      textAlign: TextAlign.left,
+                                    ),
+                                  ),
 
-                            String startHourString = getHour(currentDayTimings['$currentTime']);
-                            String startMinuteString = getMinute(currentDayTimings['$currentTime']);
+                                  TextButton(
+                                    onPressed: (){
+                                      Navigator.pushNamed(context, '/add-card');
+                                    },
+                                    child: Row(
+                                      children: [
 
-                            startHour = int.parse(startHourString);
-                            startMinutes = int.parse(startMinuteString);
+                                        Icon(Icons.add,size: 20,color: Colors.black,),
 
-                            String startTimeEnd = getAMorPM(
-                                currentDayTimings['$currentTime']);
-
-                            if (startTimeEnd == 'PM') {
-                              if (startHour == 12) {
-                                startHourActual = startHour;
-                              }
-                              else {
-                                startHourActual = startHour + 12;
-                              }
-                            }
-                            else {
-                              startHourActual = startHour;
-                            }
-
-                            int minutes = getServiceDurationInMinutes(
-                                serviceDuration);
-
-                            String endHourString = generateNewHour(
-                                startMinuteString, startHourString, minutes);
-
-                            endHour = int.parse(endHourString);
-
-                            String endTime = generateEndTime(currentDayTimings['$currentTime'], serviceDuration);
-
-                            globalEndTime = endTime;
-
-                            String endMinutesString = getMinute(endTime);
-                            endMinutes = int.parse(endMinutesString);
-
-                            String endTimeEnd = getAMorPM(endTime);
-
-                            if (endTimeEnd == 'PM') {
-                              if (endHour == 12) {
-                                endHourActual = endHour;
-                              }
-                              else {
-                                endHourActual = endHour + 12;
-                              }
-                            }
-                            else {
-                              endHourActual = endHour;
-                            }
-
-                            globalStartTime = currentDayTimings['$currentTime'];
-
-                            if(loggedIn){
-                              Navigator.pushNamed(context, '/payment');
-                            }
-                            else{
-                              Navigator.pushNamed(context, '/login');
-                            }
+                                        Text('Add Credit Card', style: TextStyle(
+                                          color: Colors.black,
+                                        ),),
 
 
-                            print('START TIME: $globalStartTime');
-                            print('END TIME: $globalEndTime');
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              ),
+
+                              SizedBox(height: 10,),
+
+                              FutureBuilder(
+                                future: categoryData(),
+                                builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                                  if(snapshot.connectionState == ConnectionState.done){
+                                    if(snapshot.hasError){
+                                      return const Text("There is an error");
+                                    }
+                                    else if(snapshot.hasData){
+                                      if(paymentMethodSelected == false){
+
+                                        if(snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['both'] || snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['cash']){
+                                          return Container(
+                                            margin: EdgeInsets.only(right: 10),
+                                            child: TextButton(
+                                              onPressed: (){
+                                                Navigator.pushNamed(context, '/payment-methods');
+                                              },
+                                              child: ListTile(
+                                                leading: Icon(Icons.money_rounded,color: Colors.green,),
+                                                title: Text('Cash'),
+                                                trailing: Icon(Icons.arrow_downward,color: Colors.black,),
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                        else{
+                                          return Container(
+                                            margin: EdgeInsets.only(right: 30),
+                                            child: TextButton(
+                                              onPressed: (){
+                                                Navigator.pushNamed(context, '/payment-methods');
+                                              },
+                                              child: ListTile(
+                                                leading: Icon(Icons.credit_card ,color: Colors.blue,),
+                                                title: addedCreditCard?Text('Credit'):Text('No Credit Card Added'),
+                                                trailing: Icon(Icons.arrow_right,color:Colors.black,),
+                                              ),
+                                            ),
+                                          );
+                                        }
 
 
-                          },
-                          child: Text(
-                            'Make An Appointment',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontFamily: 'Roboto',
-                              fontWeight: FontWeight.w500,
-                            ),
+
+                                      }
+                                      else{
+                                        return Container();
+                                      }
+                                    }
+                                  }
+                                  return const Text("Please wait");
+                                },
+
+                              ),
+
+
+                              SizedBox(height: 10,),
+
+                              Row(
+                                children: [
+
+                                  Container(
+                                    width: MediaQuery.of(context).size.width / 3,
+                                    height: 50,
+                                    margin: EdgeInsets.all(10),
+                                    child: ListTile(
+                                      title:   Text('$globalServicePrice EGP', style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold
+                                      ),),
+                                      subtitle: Text(serviceDuration),
+                                    ),
+                                  ),
+
+
+                                  Container(
+                                    alignment: Alignment.center,
+                                    width: MediaQuery.of(context).size.width / 2,
+                                    height: 54,
+                                    margin: EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: paymentMethodSelected?Colors.deepPurple:Colors.grey,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: MaterialButton(
+                                      onPressed: () async {
+                                        startYear = timePicked.year;
+                                        startMonth = timePicked.month;
+                                        startDay = timePicked.day;
+
+                                        globalYear = startYear;
+                                        globalDay = startDay;
+                                        globalDayWords = currentDayOfWeek;
+
+                                        String startHourString = getHour(currentDayTimings['$currentTime']);
+                                        String startMinuteString = getMinute(currentDayTimings['$currentTime']);
+
+                                        startHour = int.parse(startHourString);
+                                        startMinutes = int.parse(startMinuteString);
+
+                                        String startTimeEnd = getAMorPM(
+                                            currentDayTimings['$currentTime']);
+
+                                        if (startTimeEnd == 'PM') {
+                                          if (startHour == 12) {
+                                            startHourActual = startHour;
+                                          }
+                                          else {
+                                            startHourActual = startHour + 12;
+                                          }
+                                        }
+                                        else {
+                                          startHourActual = startHour;
+                                        }
+
+                                        int minutes = getServiceDurationInMinutes(
+                                            serviceDuration);
+
+                                        String endHourString = generateNewHour(
+                                            startMinuteString, startHourString, minutes);
+
+                                        endHour = int.parse(endHourString);
+
+                                        String endTime = generateEndTime(currentDayTimings['$currentTime'], serviceDuration);
+
+                                        globalEndTime = endTime;
+
+                                        String endMinutesString = getMinute(endTime);
+                                        endMinutes = int.parse(endMinutesString);
+
+                                        String endTimeEnd = getAMorPM(endTime);
+
+                                        if (endTimeEnd == 'PM') {
+                                          if (endHour == 12) {
+                                            endHourActual = endHour;
+                                          }
+                                          else {
+                                            endHourActual = endHour + 12;
+                                          }
+                                        }
+                                        else {
+                                          endHourActual = endHour;
+                                        }
+
+                                        globalStartTime = currentDayTimings['$currentTime'];
+
+                                        if(loggedIn){
+                                          Navigator.pushNamed(context, '/payment');
+                                        }
+                                        else{
+                                          Navigator.pushNamed(context, '/login');
+                                        }
+
+
+                                        // print('START TIME: $globalStartTime');
+                                        //print('END TIME: $globalEndTime');
+
+
+                                      },
+                                      child: Text(
+                                        'Book',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+
+                                ],
+                              ),
+                            ],
                           ),
                         ),
                       ),
+
 
                     ],
                   );
@@ -718,26 +848,32 @@ class _BarberTimeState extends State<BarberTime> {
       height: 100,
       margin: EdgeInsets.only(left: 20, top: 10),
       decoration: BoxDecoration(
-        color: index == currentTime ? Colors.blue : Color(0xffEEEEEE),
+        color: Colors.white ,
         borderRadius: BorderRadius.circular(5),
+        border: Border.all(
+          color: index == currentTime ?Colors.deepPurple:Colors.grey,
+          width: index == currentTime ?3:1,
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+
           Container(
             margin: EdgeInsets.only(right: 2, left: 5),
             child: Icon(
               Icons.access_time,
-              color: Colors.black,
+              color: index == currentTime ?Colors.black:Colors.grey,
               size: 18,
             ),
           ),
+
           Container(
             margin: EdgeInsets.only(left: 2, right: 5),
             child: Text(time,
               style: TextStyle(
-                color: Colors.black,
+                color: index == currentTime ?Colors.black:Colors.grey[800],
                 fontSize: 17,
                 fontFamily: 'Roboto',
               ),
@@ -778,7 +914,7 @@ class _BarberTimeState extends State<BarberTime> {
                         //print("CURRENT EMPLOYEE: $currentEmployeeIndex");
                       },
                       child: CircleAvatar(
-                        radius: 30.0,
+                        radius: 32.0,
                         backgroundColor: (currentEmployeeIndex == index - 1)
                             ? Colors.greenAccent
                             : Colors.transparent,
@@ -787,7 +923,7 @@ class _BarberTimeState extends State<BarberTime> {
                           backgroundColor: Colors.transparent,
                           child: ClipRRect(
                             child: Image.asset(
-                                'assets/all_images/no-profile-picture.jpg'),
+                                'assets/all_images/no_profile_11.jpg'),
                             borderRadius: BorderRadius.circular(60.0),
                           ),
                         ),
@@ -854,7 +990,7 @@ class _BarberTimeState extends State<BarberTime> {
                       print("CURRENT EMPLOYEE: $mostAvailableEmployee");
                     },
                     child: CircleAvatar(
-                      radius: 30.0,
+                      radius: 32.0,
                       backgroundColor: (currentEmployeeIndex == index) ? Colors
                           .greenAccent : Colors.transparent,
                       child: CircleAvatar(
@@ -862,7 +998,7 @@ class _BarberTimeState extends State<BarberTime> {
                         backgroundColor: Colors.transparent,
                         child: ClipRRect(
                           child: Image.asset(
-                              'assets/all_images/no-profile-picture.jpg'),
+                              'assets/all_images/no_profile_11.jpg'),
                           borderRadius: BorderRadius.circular(60.0),
                         ),
                       ),
@@ -927,8 +1063,7 @@ class _BarberTimeState extends State<BarberTime> {
   String getHour(String time) {
     // WHERE THE HOUR WILL BE STORED
     String hour = "";
-    print('IN FUNCTION')
-;
+
     // CHARACTER INDEX IN TIME STRING (EXAMPLE "10:00 PM" IS TIME STRING)
     int charIndex = 0;
 
@@ -1155,33 +1290,26 @@ class _BarberTimeState extends State<BarberTime> {
     // AND THE DAY, MONTH, AND YEAR IN THE CURRENT APPOINTMENT ARE EQUAL TO WHAT IS SELECTED IN THE CALENDAR
     // THEN WE CAN BEGIN TO CHECK IF THE TIME SELECTED IS OCCUPIED OR NOT
 
-    if (snapshot
-        .data['$currentShopIndex']['appointments']['$appointmentIndex']['appointment-status'] ==
+    if (snapshot.data['$currentShopIndex']['appointments']['$appointmentIndex']['appointment-status'] ==
         'incomplete') {
       //print('X');
-      if (snapshot
-          .data['$currentShopIndex']['appointments']['$appointmentIndex']['member-name'] ==
+      if (snapshot.data['$currentShopIndex']['appointments']['$appointmentIndex']['member-name'] ==
           staffName) {
         //print('B');
-        if (snapshot
-            .data['$currentShopIndex']['appointments']['$appointmentIndex']['start-day'] ==
+        if (snapshot.data['$currentShopIndex']['appointments']['$appointmentIndex']['start-day'] ==
             day) {
           //  print('C');
-          if (snapshot
-              .data['$currentShopIndex']['appointments']['$appointmentIndex']['start-month'] ==
+          if (snapshot.data['$currentShopIndex']['appointments']['$appointmentIndex']['start-month'] ==
               month) {
             //      print('D');
-            if (snapshot
-                .data['$currentShopIndex']['appointments']['$appointmentIndex']['start-year'] ==
+            if (snapshot.data['$currentShopIndex']['appointments']['$appointmentIndex']['start-year'] ==
                 year) {
               // print('EQUAL');
               // START TIME STORED FROM DATABASE IN VARIABLE
-              String startTime = snapshot
-                  .data['$currentShopIndex']['appointments']['$appointmentIndex']['start-time'];
+              String startTime = snapshot.data['$currentShopIndex']['appointments']['$appointmentIndex']['start-time'];
 
               // END TIME
-              String endTime = snapshot
-                  .data['$currentShopIndex']['appointments']['$appointmentIndex']['end-time'];
+              String endTime = snapshot.data['$currentShopIndex']['appointments']['$appointmentIndex']['end-time'];
 
               // FUNCTION THAT CHECKS IF CURRENT TIME IS ALREADY OCCUPIED
               bool checkOccupied = isOccupied(
@@ -1198,14 +1326,22 @@ class _BarberTimeState extends State<BarberTime> {
 
 
               //print('CURRENT TIME: $currentTime');
+              //
               if (checkOccupied || checkClashing) {
-                print('$currentTime clashing for $startTime-$endTime');
-                print(' ');
+
+                if(checkOccupied){
+                  print('$currentTime occupied for $startTime-$endTime');
+                  print(' ');
+                }
+                if(checkClashing){
+                  print('$currentTime clashing for $startTime-$endTime');
+                  print(' ');
+                }
 
 
-                if (bookingsPerSlot['$startTime-$endTime-$staffName'] >=
-                    snapshot
-                        .data['$currentShopIndex']['services']['$currentServiceIndex']['max-amount-per-timing']) {
+
+
+                if (bookingsPerSlot['$startTime-$endTime-$staffName'] >= snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['max-amount-per-timing']) {
                   return true;
                 }
                 else {
@@ -1283,23 +1419,80 @@ class _BarberTimeState extends State<BarberTime> {
     return false;
   }
 
-  bool isOccupied(String startTime, String endTime, String currentTime,
-      int currentMinuteGap) {
-    String tempTime = startTime;
+  bool isOccupied(String startTime, String endTime, String currentTime, int currentMinuteGap) {
+
+    print('current time: $currentTime');
+    print('start time: $startTime');
+    print('end time: $endTime');
+    print('');
 
 
-    while (tempTime != endTime) {
-      if (tempTime == currentTime) {
-        return true;
+    bool currentGreaterThanEndTime = isGreater(currentTime,endTime);
+
+    bool currentGreaterThanStartTime = isGreater(currentTime, startTime);
+
+    if(currentGreaterThanStartTime){
+      print('$currentTime is greater than $startTime');
+    }
+
+    if(!currentGreaterThanEndTime){
+      print('$currentTime is smaller than $endTime');
+    }
+
+
+    if(currentGreaterThanEndTime == false && currentGreaterThanStartTime){
+      return true;
+    }
+    return false;
+  }
+
+
+
+
+  bool isGreater(String firstTime, String secondTime){
+
+    String firstTimeEnd = getAMorPM(firstTime);
+    String secondTimeEnd  = getAMorPM(secondTime);
+
+    String firstTimeHour = getHour(firstTime);
+    String secondTimeHour = getHour(secondTime);
+
+    int firstTimeHourInt = int.parse(firstTimeHour);
+    int secondTimeHourInt = int.parse(secondTimeHour);
+
+    String firstTimeMinute = getMinute(firstTime);
+    String endTimeMinute = getMinute(secondTime);
+
+    int firstTimeMinuteInt = int.parse(firstTimeMinute);
+    int secondTimeMinuteInt = int.parse(endTimeMinute);
+
+    if(firstTimeEnd == 'AM' && firstTimeHourInt == 12){
+      firstTimeHourInt = 0;
+    }
+    if(secondTimeEnd == 'AM' && secondTimeHourInt == 12){
+      secondTimeHourInt = 0;
+    }
+
+    if(firstTimeEnd == 'PM'){
+      if(firstTimeHourInt != 12){
+        firstTimeHourInt += 12;
       }
+    }
+    if(secondTimeEnd == 'PM'){
+      if(secondTimeHourInt != 12){
+        secondTimeHourInt += 12;
+      }
+    }
 
-      String tempHour = getHour(tempTime);
-      String tempMinute = getMinute(tempTime);
-      String tempEnd = getAMorPM(tempTime);
-
-      String newTime = generateNewTime(
-          tempTime, tempHour, tempMinute, tempEnd, currentMinuteGap);
-      tempTime = newTime;
+    if(firstTimeHourInt == secondTimeHourInt){
+     if(firstTimeMinuteInt >= secondTimeMinuteInt){
+       print('1');
+       return true;
+     }
+    }
+    else if(firstTimeHourInt > secondTimeHourInt){
+      print('2');
+      return true;
     }
     return false;
   }
