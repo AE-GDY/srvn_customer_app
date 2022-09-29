@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "595600611199",
+    "project_id": "servnn",
+    "storage_bucket": "servnn.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:595600611199:android:010ca7ab936e43654dac4a",
+        "android_client_info": {
+          "package_name": "com.app.servnn_user_side_demo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "595600611199-pamgsv3i6mvjromov3r0kav24vpuvsrl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvHKyf8eD_UDIsMv_bcp4Y5BTTj5NA-Bg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "595600611199-pamgsv3i6mvjromov3r0kav24vpuvsrl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
