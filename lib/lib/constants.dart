@@ -180,4 +180,12 @@ String typeOfItemSelected = "Services";
 
 List<CreditCard> savedCreditCards = [];
 
+CreditCard? cardSelected;
+
+bool cashSelected = false;
+bool nothingSelected = true;
+
+
+bool bookingClicked = false;
+
 

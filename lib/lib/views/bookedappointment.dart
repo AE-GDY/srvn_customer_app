@@ -1,5 +1,6 @@
 import 'package:booking_app/services/database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 import '../constants.dart';
@@ -176,90 +177,97 @@ class _SuccessfulBookingState extends State<SuccessfulBooking> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.green,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(height: 200,),
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("Appointment ", style: TextStyle(
-                  fontSize: 30,
-                  color: Colors.white,
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+
+              SizedBox(height: MediaQuery.of(context).size.height/3.5,),
+
+              Text("Appointment Confirmed", style: TextStyle(
+                fontSize: 30,
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),),
+
+              SizedBox(height: 10,),
+
+              Icon(Icons.check_circle, color: Colors.green,size: 150,),
+
+              SizedBox(height: 50,),
+              Text("${onCalender?globalDay:DateTime.now().day} ${onCalender?DateFormat.LLLL().format(timePicked):DateFormat.LLLL().format(DateTime.now())} ${onCalender?globalYear:DateTime.now().year}, $globalTime",
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.black,
                   fontWeight: FontWeight.bold,
                 ),),
-                Text("Confirmed ", style: TextStyle(
-                  fontSize: 30,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),),
-              ],
-            ),
-          ),
-          Expanded(child: Text("${onCalender?globalDay:DateTime.now().day} ${onCalender?DateFormat.LLLL().format(timePicked):DateFormat.LLLL().format(DateTime.now())} ${onCalender?globalYear:DateTime.now().year}, $globalTime",
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),),),
-          Expanded(child: SizedBox(height: 70,),),
-          FutureBuilder(
-            future: userData(),
-            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-              if(snapshot.connectionState == ConnectionState.done){
-                if(snapshot.hasError){
-                  return const Text("There is an error");
-                }
-                else if(snapshot.hasData){
-                  return Container(
-                    margin: EdgeInsets.only(bottom: 30,),
-                    width: 300,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: MaterialButton(
-                      onPressed: (){
 
-                        Navigator.pushNamed(context, '/');
+              Expanded(child: Container()),
+              FutureBuilder(
+                future: userData(),
+                builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                  if(snapshot.connectionState == ConnectionState.done){
+                    if(snapshot.hasError){
+                      return const Text("There is an error");
+                    }
+                    else if(snapshot.hasData){
+                      return Container(
+                        margin: EdgeInsets.only(bottom: 30,),
+                        width: 300,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.deepPurple,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: MaterialButton(
+                          onPressed: (){
 
-                        int notificationIndex = 0;
-                        while(notificationIndex <= snapshot.data['$userLoggedInIndex']['notification-amount']){
 
-                          if(snapshot.data['$userLoggedInIndex']['notifications']['$notificationIndex']['notification-type'] == 'Appointment Complete'){
-                            if(snapshot.data['$userLoggedInIndex']['notifications']['$notificationIndex']['viewed'] == false){
 
-                              // Open dialog
-                              openDialog(
-                                notificationIndex,
-                                snapshot.data['$userLoggedInIndex']['notifications']['$notificationIndex']['notification'],
-                                snapshot.data['$userLoggedInIndex']['notifications']['$notificationIndex']['sender'],
-                                snapshot.data['$userLoggedInIndex']['full-name'],
+                            int notificationIndex = 0;
+                            while(notificationIndex <= snapshot.data['$userLoggedInIndex']['notification-amount']){
 
-                              );
+                              if(snapshot.data['$userLoggedInIndex']['notifications']['$notificationIndex']['notification-type'] == 'Appointment Complete'){
+                                if(snapshot.data['$userLoggedInIndex']['notifications']['$notificationIndex']['viewed'] == false){
 
+                                  // Open dialog
+                                  openDialog(
+                                    notificationIndex,
+                                    snapshot.data['$userLoggedInIndex']['notifications']['$notificationIndex']['notification'],
+                                    snapshot.data['$userLoggedInIndex']['notifications']['$notificationIndex']['sender'],
+                                    snapshot.data['$userLoggedInIndex']['full-name'],
+
+                                  );
+
+                                }
+                              }
+                              notificationIndex++;
                             }
-                          }
-                          notificationIndex++;
-                        }
 
-                      },
-                      child: Text("Ok, got it!", style: TextStyle(
-                        color: Colors.black,
-                      ),),
-                    ),
-                  );
-                }
-              }
-              return const Text("Please wait");
-            },
+                            bookingClicked = false;
+                            Navigator.pushNamed(context, '/');
 
+                          },
+                          child: Text("Ok, got it!", style: TextStyle(
+                            color: Colors.white,
+                          ),),
+                        ),
+                      );
+                    }
+                  }
+                  return const Text("Please wait");
+                },
+
+              ),
+
+            ],
           ),
-
-        ],
+        ),
       ),
     );
 

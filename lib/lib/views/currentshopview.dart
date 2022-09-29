@@ -1026,6 +1026,13 @@ class ServiceTile extends StatelessWidget {
               globalMaxAmount = maxAmountPerTiming;
               typeOfItemSelected = tabSelected;
 
+
+              if(cashSelected){
+                nothingSelected = true;
+              }
+
+              cashSelected = false;
+
               Navigator.pushNamed(context, '/bookingscreen');
             },
             color: Colors.deepPurple,

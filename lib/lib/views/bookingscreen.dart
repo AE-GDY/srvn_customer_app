@@ -15,7 +15,7 @@ class BarberTime extends StatefulWidget {
 
   GlobalKey _key = GlobalKey();
 
-  var currentHeight = 200.0;
+  var currentHeight = 160.0;
 
   @override
   State<StatefulWidget> createState() => _BarberTimeState();
@@ -29,6 +29,12 @@ class _BarberTimeState extends State<BarberTime> {
     doc(currentCategory).get()).data();
   }
 
+  Future<Map<String, dynamic>?> userData() async {
+    return (await FirebaseFirestore.instance.collection('users').
+    doc("signed-up").get()).data();
+  }
+
+
   CalendarFormat format = CalendarFormat.week;
   DateTime selectedDay = DateTime.now();
   DateTime focusedDay = DateTime.now();
@@ -38,7 +44,6 @@ class _BarberTimeState extends State<BarberTime> {
   dynamic bookingsPerSlot = {};
   int currentMinuteGap = 0;
 
-  bool paymentMethodSelected = false;
 
 
   bool addedCreditCard = false;
@@ -73,6 +78,13 @@ class _BarberTimeState extends State<BarberTime> {
   @override
   Widget build(BuildContext context) {
     if (!initialSetter) {
+
+      if(savedCreditCards.length > 0){
+        nothingSelected = false;
+      }
+
+      bookingClicked = false;
+
       currentDateInWords = dateFormat.format(_chosenDate);
 
       int letterIdx = 0;
@@ -152,543 +164,778 @@ class _BarberTimeState extends State<BarberTime> {
                     initialCalendarSetup = false;
                   }
 
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      SizedBox(height: 10,),
-                      buildStaffMembers(snapshot),
-                      Divider(
-                        height: 10,
-                        color: Colors.black54,
-                        thickness: 1,
-                        //indent: 20,
-                        //endIndent: 20,
-                      ),
-                      SizedBox(
-                        height: widget.currentHeight,
-                        child: TableCalendar(
-                          key: widget._key,
-                          focusedDay: selectedDay,
-                          firstDay: DateTime(1990),
-                          lastDay: DateTime(2050),
-                          calendarFormat: format,
-                          daysOfWeekVisible: true,
-                          calendarStyle: CalendarStyle(
-                            isTodayHighlighted: true,
-                            selectedDecoration: BoxDecoration(
-                              color: Colors.deepPurple,
-                              shape: BoxShape.rectangle,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
+                  return Container(
 
-                            todayTextStyle: TextStyle(color: Colors.black),
-                            selectedTextStyle: TextStyle(color: Colors.white),
-                            todayDecoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.black,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        SizedBox(height: 10,),
+                        buildStaffMembers(snapshot),
+                        Divider(
+                          height: 10,
+                          color: Colors.black54,
+                          thickness: 1,
+                          //indent: 20,
+                          //endIndent: 20,
+                        ),
+                        SizedBox(
+                          height: widget.currentHeight,
+                          child: TableCalendar(
+                            key: widget._key,
+                            focusedDay: selectedDay,
+                            firstDay: DateTime(1990),
+                            lastDay: DateTime(2050),
+                            calendarFormat: format,
+                            daysOfWeekVisible: true,
+                            calendarStyle: CalendarStyle(
+                              isTodayHighlighted: true,
+                              selectedDecoration: BoxDecoration(
+                                color: Colors.deepPurple,
+                                shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.circular(10),
                               ),
-                              color: Colors.white,
-                              shape: BoxShape.rectangle,
-                              //borderRadius: BorderRadius.circular(10),
+
+                              todayTextStyle: TextStyle(color: Colors.black),
+                              selectedTextStyle: TextStyle(color: Colors.white),
+                              todayDecoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.black,
+                                ),
+                                color: Colors.white,
+                                shape: BoxShape.rectangle,
+                                //borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
-                          ),
-                          headerStyle: HeaderStyle(
-                            formatButtonVisible: true,
-                            titleCentered: true,
-                            formatButtonShowsNext: false,
-                          ),
-                          selectedDayPredicate: (DateTime date) {
-                            return isSameDay(selectedDay, date);
-                          },
-                          onDaySelected: (DateTime selectDay, DateTime focusDay) {
-                            setState(() {
-                              //print(selectedDay.);
-                              if ((focusDay.day >= DateTime.now().day && focusDay.month == DateTime.now().month) || focusDay.month > DateTime.now().month) {
-                                setState(() {
-                                  currentDateInWords =
-                                      dateFormat.format(focusDay);
-                                  currentDayOfWeek = '';
-                                  int letterIdx = 0;
-                                  while (letterIdx < currentDateInWords.length) {
-                                    if (currentDateInWords[letterIdx] != ' ') {
-                                      currentDayOfWeek +=
-                                      currentDateInWords[letterIdx];
+                            headerStyle: HeaderStyle(
+                              formatButtonVisible: true,
+                              titleCentered: true,
+                              formatButtonShowsNext: false,
+                            ),
+                            selectedDayPredicate: (DateTime date) {
+                              return isSameDay(selectedDay, date);
+                            },
+                            onDaySelected: (DateTime selectDay, DateTime focusDay) {
+                              setState(() {
+                                //print(selectedDay.);
+                                if ((focusDay.day >= DateTime.now().day && focusDay.month == DateTime.now().month) || focusDay.month > DateTime.now().month) {
+                                  setState(() {
+                                    currentDateInWords =
+                                        dateFormat.format(focusDay);
+                                    currentDayOfWeek = '';
+                                    int letterIdx = 0;
+                                    while (letterIdx < currentDateInWords.length) {
+                                      if (currentDateInWords[letterIdx] != ' ') {
+                                        currentDayOfWeek +=
+                                        currentDateInWords[letterIdx];
+                                      }
+                                      else {
+                                        break;
+                                      }
+                                      letterIdx++;
+                                    }
+
+                                    onCalender = true;
+                                    selectedDay = selectDay;
+                                    focusedDay = focusDay;
+                                    timePicked = selectedDay;
+
+                                    print("CURRENT DAY: ${selectedDay.day}");
+
+                                    String from = "";
+                                    String to = "";
+                                    int minuteGap = 0;
+
+                                    if (globalServiceLinked) {
+                                      from = snapshot.data['$currentShopIndex']['business-hours'][currentDayOfWeek]['from'];
+                                      to = snapshot.data['$currentShopIndex']['business-hours'][currentDayOfWeek]['to'];
                                     }
                                     else {
-                                      break;
-                                    }
-                                    letterIdx++;
-                                  }
+                                      int employeeIndex = 0;
 
-                                  onCalender = true;
-                                  selectedDay = selectDay;
-                                  focusedDay = focusDay;
-                                  timePicked = selectedDay;
+                                      if(currentEmployeeIndex == 0){
+                                        employeeIndex = mostAvailableEmployee;
+                                      }
+                                      else{
+                                        employeeIndex = currentEmployeeIndex;
+                                      }
 
-                                  print("CURRENT DAY: ${selectedDay.day}");
-
-                                  String from = "";
-                                  String to = "";
-                                  int minuteGap = 0;
-
-                                  if (globalServiceLinked) {
-                                    from = snapshot.data['$currentShopIndex']['business-hours'][currentDayOfWeek]['from'];
-                                    to = snapshot.data['$currentShopIndex']['business-hours'][currentDayOfWeek]['to'];
-                                  }
-                                  else {
-                                    int employeeIndex = 0;
-
-                                    if(currentEmployeeIndex == 0){
-                                      employeeIndex = mostAvailableEmployee;
-                                    }
-                                    else{
-                                      employeeIndex = currentEmployeeIndex;
+                                      from = snapshot.data['$currentShopIndex']['staff-members']['$employeeIndex']['member-timings'][currentDayOfWeek]['from'];
+                                      to = snapshot.data['$currentShopIndex']['staff-members']['$employeeIndex']['member-timings'][currentDayOfWeek]['to'];
                                     }
 
-                                    from = snapshot.data['$currentShopIndex']['staff-members']['$employeeIndex']['member-timings'][currentDayOfWeek]['from'];
-                                    to = snapshot.data['$currentShopIndex']['staff-members']['$employeeIndex']['member-timings'][currentDayOfWeek]['to'];
-                                  }
-
-                                  minuteGap = snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['minute-gap'];
-                                  currentMinuteGap = minuteGap;
+                                    minuteGap = snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['minute-gap'];
+                                    currentMinuteGap = minuteGap;
 
 
-                                  currentDayTimings = {};
-                                  currentDayTimings = createTimeData(from, to, minuteGap);
-                                });
-                              }
-                            });
-                          },
-                          onFormatChanged: (CalendarFormat _format) {
-                            setState(() {
-                              format = _format;
-                              print(format.toString());
-                              setState(() {
-                                if (format == CalendarFormat.week) {
-                                  widget.currentHeight = 200;
-                                }
-                                else if (format == CalendarFormat.twoWeeks) {
-                                  widget.currentHeight = 350;
-                                }
-                                else if (format == CalendarFormat.month) {
-                                  widget.currentHeight = 400;
+                                    currentDayTimings = {};
+                                    currentDayTimings = createTimeData(from, to, minuteGap);
+                                  });
                                 }
                               });
-                              //   print(widget._key!.currentContext!.size!.height);
-                            });
-                          },
-                        ),
-                      ),
-                      Divider(
-                        height: 0,
-                        color: Colors.black54,
-                        thickness: 1,
-                        //indent: 20,
-                        //endIndent: 20,
-                      ),
-                      //SizedBox(height: 40,),
-
-
-                      FutureBuilder(
-                        future: categoryData(),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<dynamic> snapshot) {
-                          if (snapshot.connectionState == ConnectionState.done) {
-                            if (snapshot.hasError) {
-                              return const Text("There is an error");
-                            }
-                            else if (snapshot.hasData) {
-                              List<bool> conflictingTimes = [];
-                              passedTimeStatuses = [];
-
-                              int timingIndex = 0;
-
-                              while (timingIndex < currentDayTimings.length) {
-                                conflictingTimes.add(false);
-                                timingIndex++;
-                              }
-
-
-                              // INITIALIZES THE BOOKINGS MAP
-                              int appointmentIndex = 0;
-                              while (appointmentIndex <= snapshot.data['$currentShopIndex']['appointments']['appointment-amount']) {
-                                // START TIME STORED FROM DATABASE IN VARIABLE
-                                String startTime = snapshot.data['$currentShopIndex']['appointments']['$appointmentIndex']['start-time'];
-
-                                // END TIME
-                                String endTime = snapshot.data['$currentShopIndex']['appointments']['$appointmentIndex']['end-time'];
-
-
-                                String staffName = snapshot.data['$currentShopIndex']['appointments']['$appointmentIndex']['member-name'];
-
-                                bookingsPerSlot['$startTime-$endTime-$staffName'] =
-                                0;
-
-                                appointmentIndex++;
-                              }
-
-
-                              // FILLS THE BOOKINGS MAP WITH THE AMOUNT OF APPOINTMENTS PER TIMING
-                              appointmentIndex = 0;
-                              while (appointmentIndex <= snapshot.data['$currentShopIndex']['appointments']['appointment-amount']) {
-                                // START TIME STORED FROM DATABASE IN VARIABLE
-                                String startTime = snapshot.data['$currentShopIndex']['appointments']['$appointmentIndex']['start-time'];
-
-                                // END TIME
-                                String endTime = snapshot.data['$currentShopIndex']['appointments']['$appointmentIndex']['end-time'];
-
-
-                                String staffName = snapshot.data['$currentShopIndex']['appointments']['$appointmentIndex']['member-name'];
-
-                                int currentAmountOfBookings = bookingsPerSlot['$startTime-$endTime-$staffName'];
-                                currentAmountOfBookings++;
-                                bookingsPerSlot['$startTime-$endTime-$staffName'] = currentAmountOfBookings;
-
-                                appointmentIndex++;
-                              }
-
-
-                              int employeeIndex = 0;
-
-                              if(currentEmployeeIndex == 0){
-                                employeeIndex = mostAvailableEmployee;
-                              }
-                              else{
-                                employeeIndex = currentEmployeeIndex;
-                              }
-
-
-                              timingIndex = 0;
-                              while (timingIndex < currentDayTimings.length) {
-                                bool isConflicting = false;
-                                appointmentIndex = 0;
-                                while (appointmentIndex <= snapshot.data['$currentShopIndex']['appointments']['appointment-amount']) {
-                                  isConflicting = isInConflict(
-                                      appointmentIndex,
-                                      serviceBooked,
-                                      globalServiceLinked ? "none" : snapshot.data['$currentShopIndex']['staff-members']['$employeeIndex']['member-name'],
-                                      selectedDay.day,
-                                      selectedDay.month,
-                                      selectedDay.year,
-                                      currentDayTimings['$timingIndex'],
-                                      snapshot
-                                  );
-
-                                  if (isConflicting) {
-                                    conflictingTimes[timingIndex] = true;
-                                    break;
+                            },
+                            onFormatChanged: (CalendarFormat _format) {
+                              setState(() {
+                                format = _format;
+                                print(format.toString());
+                                setState(() {
+                                  if (format == CalendarFormat.week) {
+                                    widget.currentHeight = 150;
                                   }
+                                  else if (format == CalendarFormat.twoWeeks) {
+                                    widget.currentHeight = 350;
+                                  }
+                                  else if (format == CalendarFormat.month) {
+                                    widget.currentHeight = 400;
+                                  }
+                                });
+                                //   print(widget._key!.currentContext!.size!.height);
+                              });
+                            },
+                          ),
+                        ),
+                        Divider(
+                          height: 0,
+                          color: Colors.black54,
+                          thickness: 1,
+                          //indent: 20,
+                          //endIndent: 20,
+                        ),
+                        //SizedBox(height: 40,),
+
+
+                        FutureBuilder(
+                          future: categoryData(),
+                          builder: (BuildContext context,
+                              AsyncSnapshot<dynamic> snapshot) {
+                            if (snapshot.connectionState == ConnectionState.done) {
+                              if (snapshot.hasError) {
+                                return const Text("There is an error");
+                              }
+                              else if (snapshot.hasData) {
+                                List<bool> conflictingTimes = [];
+                                passedTimeStatuses = [];
+
+                                int timingIndex = 0;
+
+                                while (timingIndex < currentDayTimings.length) {
+                                  conflictingTimes.add(false);
+                                  timingIndex++;
+                                }
+
+
+                                // INITIALIZES THE BOOKINGS MAP
+                                int appointmentIndex = 0;
+                                while (appointmentIndex <= snapshot.data['$currentShopIndex']['appointments']['appointment-amount']) {
+                                  // START TIME STORED FROM DATABASE IN VARIABLE
+                                  String startTime = snapshot.data['$currentShopIndex']['appointments']['$appointmentIndex']['start-time'];
+
+                                  // END TIME
+                                  String endTime = snapshot.data['$currentShopIndex']['appointments']['$appointmentIndex']['end-time'];
+
+
+                                  String staffName = snapshot.data['$currentShopIndex']['appointments']['$appointmentIndex']['member-name'];
+
+                                  bookingsPerSlot['$startTime-$endTime-$staffName'] =
+                                  0;
 
                                   appointmentIndex++;
                                 }
-                                timingIndex++;
-                              }
 
-                              timingIndex = 0;
-                              while(timingIndex < currentDayTimings.length){
 
-                                String currentTime = currentDayTimings['$timingIndex'];
-                                String currentHourString = getHour(currentTime);
+                                // FILLS THE BOOKINGS MAP WITH THE AMOUNT OF APPOINTMENTS PER TIMING
+                                appointmentIndex = 0;
+                                while (appointmentIndex <= snapshot.data['$currentShopIndex']['appointments']['appointment-amount']) {
+                                  // START TIME STORED FROM DATABASE IN VARIABLE
+                                  String startTime = snapshot.data['$currentShopIndex']['appointments']['$appointmentIndex']['start-time'];
 
-                                int currentHour = int.parse(getHour(currentHourString));
-                                String end = getAMorPM(currentDayTimings['$timingIndex']);
+                                  // END TIME
+                                  String endTime = snapshot.data['$currentShopIndex']['appointments']['$appointmentIndex']['end-time'];
 
-                                String minuteString = getMinute(currentDayTimings['$timingIndex']);
-                                int minute = 0;
 
-                                if(minuteString != '00'){
-                                  minute = int.parse(minuteString);
+                                  String staffName = snapshot.data['$currentShopIndex']['appointments']['$appointmentIndex']['member-name'];
+
+                                  int currentAmountOfBookings = bookingsPerSlot['$startTime-$endTime-$staffName'];
+                                  currentAmountOfBookings++;
+                                  bookingsPerSlot['$startTime-$endTime-$staffName'] = currentAmountOfBookings;
+
+                                  appointmentIndex++;
                                 }
 
-                                if(end == 'PM'){
-                                  if(currentHour < 12){
-                                    currentHour += 12;
-                                  }
+
+                                int employeeIndex = 0;
+
+                                if(currentEmployeeIndex == 0){
+                                  employeeIndex = mostAvailableEmployee;
                                 }
                                 else{
-                                  if(currentHour == 12){
-                                    currentHour -= 12;
-                                  }
+                                  employeeIndex = currentEmployeeIndex;
                                 }
 
 
-                                bool timePassed = passedTime(currentHour, minute, selectedDay.day, selectedDay.month, selectedDay.year);
-                                passedTimeStatuses.add(timePassed);
+                                timingIndex = 0;
+                                while (timingIndex < currentDayTimings.length) {
+                                  bool isConflicting = false;
+                                  appointmentIndex = 0;
+                                  while (appointmentIndex <= snapshot.data['$currentShopIndex']['appointments']['appointment-amount']) {
+                                    isConflicting = isInConflict(
+                                        appointmentIndex,
+                                        serviceBooked,
+                                        globalServiceLinked ? "none" : snapshot.data['$currentShopIndex']['staff-members']['$employeeIndex']['member-name'],
+                                        selectedDay.day,
+                                        selectedDay.month,
+                                        selectedDay.year,
+                                        currentDayTimings['$timingIndex'],
+                                        snapshot
+                                    );
 
-                                timingIndex++;
-                              }
-
-
-                              return Container(
-                                height: 50,
-                                margin: EdgeInsets.only(right: 20),
-                                child: ListView.builder(
-                                  //timingAmount
-                                  itemCount: currentDayTimings.length,
-                                  scrollDirection: Axis.horizontal,
-                                  physics: ScrollPhysics(),
-                                  shrinkWrap: true,
-                                  itemBuilder: (context, index) {
-
-                                    print('INDEX: $index');
-
-                                    print(conflictingTimes[index]);
-                                    print('');
-
-
-                                    if (conflictingTimes[index] || passedTimeStatuses[index]) {
-                                      return Container();
+                                    if (isConflicting) {
+                                      conflictingTimes[timingIndex] = true;
+                                      break;
                                     }
-                                    else {
-                                      return MaterialButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            currentTime = index;
-                                          });
-                                        },
-                                        child: timingsData(
-                                          currentDayTimings['$index'],
-                                          index,
-                                          snapshot,
-                                        ),
-                                      );
-                                    }
-                                  },
-                                ),
-                              );
-                            }
-                          }
-                          return const Text("Please wait");
-                        },
 
-                      ),
+                                    appointmentIndex++;
+                                  }
+                                  timingIndex++;
+                                }
 
-                      SizedBox(height: 30,),
+                                timingIndex = 0;
+                                while(timingIndex < currentDayTimings.length){
 
+                                  String currentTime = currentDayTimings['$timingIndex'];
+                                  String currentHourString = getHour(currentTime);
 
-                      Container(
-                        height: MediaQuery.of(context).size.height/3,
-                        child: Card(
-                          elevation: 10.0,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+                                  int currentHour = int.parse(getHour(currentHourString));
+                                  String end = getAMorPM(currentDayTimings['$timingIndex']);
 
-                              Row(
-                                children: [
-                                  Container(
-                                    margin: EdgeInsets.all(10),
-                                    child: Text('Payment Method', style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                      textAlign: TextAlign.left,
-                                    ),
-                                  ),
+                                  String minuteString = getMinute(currentDayTimings['$timingIndex']);
+                                  int minute = 0;
 
-                                  TextButton(
-                                    onPressed: (){
-                                      Navigator.pushNamed(context, '/add-card');
-                                    },
-                                    child: Row(
-                                      children: [
+                                  if(minuteString != '00'){
+                                    minute = int.parse(minuteString);
+                                  }
 
-                                        Icon(Icons.add,size: 20,color: Colors.black,),
-
-                                        Text('Add Credit Card', style: TextStyle(
-                                          color: Colors.black,
-                                        ),),
-
-
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              ),
-
-                              SizedBox(height: 10,),
-
-                              FutureBuilder(
-                                future: categoryData(),
-                                builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                                  if(snapshot.connectionState == ConnectionState.done){
-                                    if(snapshot.hasError){
-                                      return const Text("There is an error");
-                                    }
-                                    else if(snapshot.hasData){
-                                      if(paymentMethodSelected == false){
-
-                                        if(snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['both'] || snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['cash']){
-                                          return Container(
-                                            margin: EdgeInsets.only(right: 10),
-                                            child: TextButton(
-                                              onPressed: (){
-                                                Navigator.pushNamed(context, '/payment-methods');
-                                              },
-                                              child: ListTile(
-                                                leading: Icon(Icons.money_rounded,color: Colors.green,),
-                                                title: Text('Cash'),
-                                                trailing: Icon(Icons.arrow_downward,color: Colors.black,),
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                        else{
-                                          return Container(
-                                            margin: EdgeInsets.only(right: 30),
-                                            child: TextButton(
-                                              onPressed: (){
-                                                Navigator.pushNamed(context, '/payment-methods');
-                                              },
-                                              child: ListTile(
-                                                leading: Icon(Icons.credit_card ,color: Colors.blue,),
-                                                title: addedCreditCard?Text('Credit'):Text('No Credit Card Added'),
-                                                trailing: Icon(Icons.arrow_right,color:Colors.black,),
-                                              ),
-                                            ),
-                                          );
-                                        }
-
-
-
-                                      }
-                                      else{
-                                        return Container();
-                                      }
+                                  if(end == 'PM'){
+                                    if(currentHour < 12){
+                                      currentHour += 12;
                                     }
                                   }
-                                  return const Text("Please wait");
-                                },
+                                  else{
+                                    if(currentHour == 12){
+                                      currentHour -= 12;
+                                    }
+                                  }
 
-                              ),
+
+                                  bool timePassed = passedTime(currentHour, minute, selectedDay.day, selectedDay.month, selectedDay.year);
+                                  passedTimeStatuses.add(timePassed);
+
+                                  timingIndex++;
+                                }
 
 
-                              SizedBox(height: 10,),
+                                return Container(
+                                  height: 50,
+                                  margin: EdgeInsets.only(right: 20),
+                                  child: ListView.builder(
+                                    //timingAmount
+                                    itemCount: currentDayTimings.length,
+                                    scrollDirection: Axis.horizontal,
+                                    physics: ScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemBuilder: (context, index) {
 
-                              Row(
-                                children: [
+                                      print('INDEX: $index');
 
-                                  Container(
-                                    width: MediaQuery.of(context).size.width / 3,
-                                    height: 50,
-                                    margin: EdgeInsets.all(10),
-                                    child: ListTile(
-                                      title:   Text('$globalServicePrice EGP', style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold
-                                      ),),
-                                      subtitle: Text(serviceDuration),
-                                    ),
+                                      print(conflictingTimes[index]);
+                                      print('');
+
+
+                                      if (conflictingTimes[index] || passedTimeStatuses[index]) {
+                                        return Container();
+                                      }
+                                      else {
+                                        return MaterialButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              currentTime = index;
+                                            });
+                                          },
+                                          child: timingsData(
+                                            currentDayTimings['$index'],
+                                            index,
+                                            snapshot,
+                                          ),
+                                        );
+                                      }
+                                    },
                                   ),
+                                );
+                              }
+                            }
+                            return const Text("Please wait");
+                          },
+
+                        ),
+
+                        SizedBox(height: 30,),
 
 
-                                  Container(
-                                    alignment: Alignment.center,
-                                    width: MediaQuery.of(context).size.width / 2,
-                                    height: 54,
-                                    margin: EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: paymentMethodSelected?Colors.deepPurple:Colors.grey,
-                                      borderRadius: BorderRadius.circular(10),
+                        Container(
+                          height: MediaQuery.of(context).size.height/3,
+                          child: Card(
+                            elevation: 10.0,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+
+                                Row(
+                                  children: [
+                                    Container(
+                                      margin: EdgeInsets.all(10),
+                                      child: Text('Payment Method', style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                        textAlign: TextAlign.left,
+                                      ),
                                     ),
-                                    child: MaterialButton(
-                                      onPressed: () async {
-                                        startYear = timePicked.year;
-                                        startMonth = timePicked.month;
-                                        startDay = timePicked.day;
 
-                                        globalYear = startYear;
-                                        globalDay = startDay;
-                                        globalDayWords = currentDayOfWeek;
-
-                                        String startHourString = getHour(currentDayTimings['$currentTime']);
-                                        String startMinuteString = getMinute(currentDayTimings['$currentTime']);
-
-                                        startHour = int.parse(startHourString);
-                                        startMinutes = int.parse(startMinuteString);
-
-                                        String startTimeEnd = getAMorPM(
-                                            currentDayTimings['$currentTime']);
-
-                                        if (startTimeEnd == 'PM') {
-                                          if (startHour == 12) {
-                                            startHourActual = startHour;
-                                          }
-                                          else {
-                                            startHourActual = startHour + 12;
-                                          }
-                                        }
-                                        else {
-                                          startHourActual = startHour;
-                                        }
-
-                                        int minutes = getServiceDurationInMinutes(
-                                            serviceDuration);
-
-                                        String endHourString = generateNewHour(
-                                            startMinuteString, startHourString, minutes);
-
-                                        endHour = int.parse(endHourString);
-
-                                        String endTime = generateEndTime(currentDayTimings['$currentTime'], serviceDuration);
-
-                                        globalEndTime = endTime;
-
-                                        String endMinutesString = getMinute(endTime);
-                                        endMinutes = int.parse(endMinutesString);
-
-                                        String endTimeEnd = getAMorPM(endTime);
-
-                                        if (endTimeEnd == 'PM') {
-                                          if (endHour == 12) {
-                                            endHourActual = endHour;
-                                          }
-                                          else {
-                                            endHourActual = endHour + 12;
-                                          }
-                                        }
-                                        else {
-                                          endHourActual = endHour;
-                                        }
-
-                                        globalStartTime = currentDayTimings['$currentTime'];
+                                    TextButton(
+                                      onPressed: (){
 
                                         if(loggedIn){
-                                          Navigator.pushNamed(context, '/payment');
+                                          Navigator.pushNamed(context, '/add-card');
                                         }
                                         else{
                                           Navigator.pushNamed(context, '/login');
                                         }
 
-
-                                        // print('START TIME: $globalStartTime');
-                                        //print('END TIME: $globalEndTime');
-
-
                                       },
-                                      child: Text(
-                                        'Book',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                      child: Row(
+                                        children: [
+
+                                          Icon(Icons.add,size: 20,color: Colors.black,),
+
+                                          Text('Add Credit Card', style: TextStyle(
+                                            color: Colors.black,
+                                          ),),
+
+
+                                        ],
                                       ),
                                     ),
-                                  ),
+                                  ],
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                ),
+
+                                SizedBox(height: 10,),
+
+                                FutureBuilder(
+                                  future: categoryData(),
+                                  builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                                    if(snapshot.connectionState == ConnectionState.done){
+                                      if(snapshot.hasError){
+                                        return const Text("There is an error");
+                                      }
+                                      else if(snapshot.hasData){
+
+                                        if(snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['both'] == false && snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['cash'] == true){
+                                          cashSelected = true;
+
+                                          return Container(
+                                            margin: EdgeInsets.only(right: 10),
+                                            child: TextButton(
+                                              onPressed: (){
+
+                                              },
+                                              child: ListTile(
+                                                leading: Icon(Icons.money_rounded,color: Colors.green,),
+                                                title: Text('Cash'),
+                                              ),
+                                            ),
+                                          );
+                                        }
+
+                                        else if(nothingSelected){
+
+                                          if(snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['both'] || snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['cash']){
 
 
-                                ],
-                              ),
-                            ],
+                                            print('BOTH OR CASH');
+
+                                            cashSelected = true;
+
+                                            return Container(
+                                              margin: EdgeInsets.only(right: 10),
+                                              child: TextButton(
+                                                onPressed: (){
+
+                                                  if(loggedIn){
+                                                    Navigator.pushNamed(context, '/payment-methods');
+                                                  }
+                                                  else{
+                                                    Navigator.pushNamed(context, '/login');
+                                                  }
+                                                },
+                                                child: ListTile(
+                                                  leading: Icon(Icons.money_rounded,color: Colors.green,),
+                                                  title: Text('Cash'),
+                                                  trailing: Icon(Icons.arrow_downward,color: Colors.black,),
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                          else{
+                                            if(cashSelected){
+                                              return Container(
+                                                margin: EdgeInsets.only(right: 10),
+                                                child: TextButton(
+                                                  onPressed: (){
+
+                                                    if(loggedIn){
+                                                      Navigator.pushNamed(context, '/payment-methods');
+                                                    }
+                                                    else{
+                                                      Navigator.pushNamed(context, '/login');
+                                                    }
+
+                                                  },
+                                                  child: ListTile(
+                                                    leading: Icon(Icons.money_rounded,color: Colors.green,),
+                                                    title: Text('Cash'),
+                                                    trailing: Icon(Icons.arrow_downward,color: Colors.black,),
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                            else{
+
+                                              return Container(
+                                                margin: EdgeInsets.only(right: 30),
+                                                child: TextButton(
+                                                  onPressed: (){
+                                                    if(loggedIn){
+                                                      Navigator.pushNamed(context, '/payment-methods');
+                                                    }
+                                                    else{
+                                                      Navigator.pushNamed(context, '/login');
+                                                    }
+                                                  },
+                                                  child: ListTile(
+                                                    leading: Icon(Icons.credit_card ,color: Colors.blue,),
+                                                    title: savedCreditCards.length > 0?Text(savedCreditCards[0].nickname):Text('No Credit Card Added'),
+                                                    trailing: Icon(Icons.arrow_right,color:Colors.black,),
+                                                  ),
+                                                ),
+                                              );
+                                            }
+
+                                          }
+                                        }
+                                        else{
+
+                                          if(cashSelected){
+                                            return Container(
+                                              margin: EdgeInsets.only(right: 10),
+                                              child: TextButton(
+                                                onPressed: (){
+                                                  if(loggedIn){
+                                                    Navigator.pushNamed(context, '/payment-methods');
+                                                  }
+                                                  else{
+                                                    Navigator.pushNamed(context, '/login');
+                                                  }
+                                                },
+                                                child: ListTile(
+                                                  leading: Icon(Icons.money_rounded,color: Colors.green,),
+                                                  title: Text('Cash'),
+                                                  trailing: Icon(Icons.arrow_downward,color: Colors.black,),
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                          else{
+                                            return Container(
+                                              margin: EdgeInsets.only(right: 30),
+                                              child: TextButton(
+                                                onPressed: (){
+                                                  if(loggedIn){
+                                                    Navigator.pushNamed(context, '/payment-methods');
+                                                  }
+                                                  else{
+                                                    Navigator.pushNamed(context, '/login');
+                                                  }
+                                                },
+                                                child: ListTile(
+                                                  leading: Icon(Icons.credit_card ,color: Colors.blue,),
+                                                  title: Text(cardSelected!.nickname),
+                                                  trailing: Icon(Icons.arrow_right,color:Colors.black,),
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        }
+                                      }
+                                    }
+                                    return const Text("Please wait");
+                                  },
+
+                                ),
+
+
+                                SizedBox(height: 10,),
+
+                                Row(
+                                  children: [
+
+                                    Container(
+                                      width: MediaQuery.of(context).size.width / 3,
+                                      height: 50,
+                                      margin: EdgeInsets.all(10),
+                                      child: ListTile(
+                                        title:   Text('$globalServicePrice EGP', style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold
+                                        ),),
+                                        subtitle: Text(serviceDuration),
+                                      ),
+                                    ),
+
+
+                                    FutureBuilder(
+                                      future: Future.wait([categoryData(),userData()]),
+                                      builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+                                        if(snapshot.connectionState == ConnectionState.done){
+                                          if(snapshot.hasError){
+                                            return const Text("There is an error");
+                                          }
+                                          else if(snapshot.hasData){
+                                            return Container(
+                                              alignment: Alignment.center,
+                                              width: MediaQuery.of(context).size.width / 2,
+                                              height: 54,
+                                              margin: EdgeInsets.all(10),
+                                              decoration: BoxDecoration(
+                                                color: nothingSelected == false || cashSelected == true?Colors.deepPurple:Colors.grey,
+                                                borderRadius: BorderRadius.circular(10),
+                                              ),
+                                              child: MaterialButton(
+                                                onPressed: () async {
+
+                                                  if(nothingSelected == false || cashSelected == true){
+                                                    startYear = timePicked.year;
+                                                    startMonth = timePicked.month;
+                                                    startDay = timePicked.day;
+
+                                                    globalYear = startYear;
+                                                    globalDay = startDay;
+                                                    globalDayWords = currentDayOfWeek;
+
+                                                    String startHourString = getHour(currentDayTimings['$currentTime']);
+                                                    String startMinuteString = getMinute(currentDayTimings['$currentTime']);
+
+                                                    startHour = int.parse(startHourString);
+                                                    startMinutes = int.parse(startMinuteString);
+
+                                                    String startTimeEnd = getAMorPM(
+                                                        currentDayTimings['$currentTime']);
+
+                                                    if (startTimeEnd == 'PM') {
+                                                      if (startHour == 12) {
+                                                        startHourActual = startHour;
+                                                      }
+                                                      else {
+                                                        startHourActual = startHour + 12;
+                                                      }
+                                                    }
+                                                    else {
+                                                      startHourActual = startHour;
+                                                    }
+
+                                                    int minutes = getServiceDurationInMinutes(
+                                                        serviceDuration);
+
+                                                    String endHourString = generateNewHour(
+                                                        startMinuteString, startHourString, minutes);
+
+                                                    endHour = int.parse(endHourString);
+
+                                                    String endTime = generateEndTime(currentDayTimings['$currentTime'], serviceDuration);
+
+                                                    globalEndTime = endTime;
+
+                                                    String endMinutesString = getMinute(endTime);
+                                                    endMinutes = int.parse(endMinutesString);
+
+                                                    String endTimeEnd = getAMorPM(endTime);
+
+                                                    if (endTimeEnd == 'PM') {
+                                                      if (endHour == 12) {
+                                                        endHourActual = endHour;
+                                                      }
+                                                      else {
+                                                        endHourActual = endHour + 12;
+                                                      }
+                                                    }
+                                                    else {
+                                                      endHourActual = endHour;
+                                                    }
+
+                                                    globalStartTime = currentDayTimings['$currentTime'];
+
+
+                                                    bookingClicked = true;
+
+                                                    if(loggedIn){
+                                                      if(typeOfItemSelected == 'Services'){
+                                                        print("1");
+                                                        await databaseService.updateAppointmentStats(
+                                                          currentCategory,
+                                                          currentShopIndex,
+                                                          months[startMonth-1],
+                                                          snapshot.data![0]['$currentShopIndex']['appointments']['appointment-amount']+1,
+                                                        );
+
+
+                                                        print("2");
+
+                                                        await databaseService.addAppointment(
+                                                          globalDayWords,
+                                                          snapshot.data![1]['$userLoggedInIndex']['full-name'],
+                                                          snapshot.data![1]['$userLoggedInIndex']['email'],
+                                                          currentCategory,
+                                                          currentShopIndex,
+                                                          snapshot.data![0]['$currentShopIndex']['appointments']['appointment-amount']+1,
+                                                          snapshot.data![0]['$currentShopIndex']['appointments']['incomplete']+1,
+                                                          startYear,
+                                                          startMonth,
+                                                          startDay,
+                                                          startHour,
+                                                          startHourActual,
+                                                          startMinutes,
+                                                          startYear,
+                                                          startMonth,
+                                                          startDay,
+                                                          endHour,
+                                                          endHourActual,
+                                                          endMinutes,
+                                                          'blank',
+                                                          serviceBooked,
+                                                          globalServicePrice,
+                                                          globalServiceLinked?"none":snapshot.data![0]['$currentShopIndex']['staff-members']['$currentEmployeeIndex']['member-name'],
+                                                          globalServiceLinked?"none":snapshot.data![0]['$currentShopIndex']['staff-members']['$currentEmployeeIndex']['member-role'],
+                                                          'Services',
+                                                          serviceDuration,
+                                                          snapshot.data![1]["$userLoggedInIndex"]['appointment-amount']+1,
+                                                          globalStartTime,
+                                                          globalEndTime,
+                                                        );
+
+                                                        print("3");
+
+
+                                                        globalTime = '$globalStartTime-$globalEndTime';
+
+                                                        await databaseService.updateUserAppointments(
+                                                          snapshot.data![1]["$userLoggedInIndex"]['appointment-amount']+1,
+                                                          userLoggedInIndex,
+                                                          "${onCalender?globalDay:DateTime.now().day} ${onCalender?DateFormat.LLLL().format(timePicked):DateFormat.LLLL().format(DateTime.now())} ${onCalender?globalYear:DateTime.now().year}, $globalTime",
+                                                          serviceBooked,
+                                                          currentShop,
+                                                          serviceDuration,
+                                                          globalServiceLinked?"none":snapshot.data![0]['$currentShopIndex']['staff-members']['$currentEmployeeIndex']['member-name'],
+                                                          globalServicePrice,
+                                                        );
+
+                                                        print("4");
+                                                      }
+                                                      else{
+
+                                                        // TEST THIS PART
+                                                        await databaseService.addMember(
+                                                          currentCategory,
+                                                          currentShopIndex,
+                                                          snapshot.data![0]['$currentShopIndex']['members-amount']+1,
+                                                          snapshot.data![0]['$currentShopIndex']['memberships']['$currentMembershipIndex']['name'],
+                                                          snapshot.data![1]['$userLoggedInIndex']['full-name'],
+                                                          snapshot.data![1]['$userLoggedInIndex']['email'],
+                                                          DateTime.now().day,
+                                                          DateTime.now().month,
+                                                          DateTime.now().year,
+                                                        );
+
+                                                        await databaseService.addUserMembership(
+                                                          userLoggedInIndex,
+                                                          snapshot.data![1]['$userLoggedInIndex']['membership-amount']+1,
+                                                          snapshot.data![0]['$currentShopIndex']['memberships']['$currentMembershipIndex']['name'],
+                                                          currentShop,
+                                                          DateTime.now().day,
+                                                          DateTime.now().month,
+                                                          DateTime.now().year,
+                                                        );
+                                                      }
+
+                                                      int clientIndex = 0;
+                                                      bool clientFound = false;
+                                                      while(clientIndex <= snapshot.data![0]['$currentShopIndex']['client-amount']){
+
+                                                        if(snapshot.data![0]['$currentShopIndex']['clients']['$clientIndex']['email'] == snapshot.data![1]['$userLoggedInIndex']['email']){
+                                                          clientFound = true;
+                                                          break;
+                                                        }
+
+                                                        clientIndex++;
+                                                      }
+
+                                                      print("5");
+
+                                                      if(!clientFound){
+                                                        await databaseService.addClient(
+                                                          currentCategory,
+                                                          currentShopIndex,
+                                                          snapshot.data![0]['$currentShopIndex']['client-amount']+1,
+                                                          snapshot.data![1]['$userLoggedInIndex']['full-name'],
+                                                          snapshot.data![1]['$userLoggedInIndex']['email'],
+                                                        );
+                                                      }
+                                                      Navigator.pushNamed(context, '/booked');
+                                                    }
+                                                    else{
+                                                      Navigator.pushNamed(context, '/login');
+                                                    }
+                                                  }
+
+
+                                                },
+                                                child: Text(
+                                                  'Book',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        }
+                                        return const CircularProgressIndicator();
+                                      },
+
+                                    ),
+
+
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
 
 
-                    ],
+                      ],
+                    ),
                   );
                 }
                 else{

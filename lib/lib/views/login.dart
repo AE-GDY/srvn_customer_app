@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:booking_app/constants.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -11,6 +12,12 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+
+  Future<Map<String, dynamic>?> categoryData() async {
+    return (await FirebaseFirestore.instance.collection('shops').
+    doc(currentCategory).get()).data();
+  }
+
   bool _rememberMe = false;
 
   var formKey = GlobalKey<FormState>();
@@ -85,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
               }
             },
             decoration: InputDecoration(
-              border: InputBorder.none,
+            //  border: InputBorder.none,
               contentPadding: EdgeInsets.only(top: 14.0),
               prefixIcon: Icon(
                 Icons.email,
@@ -123,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 fontFamily: 'OpenSans',
               ),
               decoration: InputDecoration(
-                border: InputBorder.none,
+                //border: InputBorder.none,
                 contentPadding: EdgeInsets.only(top: 14.0),
                 prefixIcon: Icon(
                   Icons.email,
@@ -150,8 +157,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
     passwordFound = false;
 
-    while(idx <= snapshot.data['total-user-amount']){
-      if(snapshot.data['$idx']['password'] == passwordController.text) {
+    while(idx <= snapshot.data[1]['total-user-amount']){
+      if(snapshot.data[1]['$idx']['password'] == passwordController.text) {
         setState(() {
           passwordFound = true;
           userLoggedInIndex = idx;
@@ -177,8 +184,8 @@ class _LoginScreenState extends State<LoginScreen> {
     emailFound = false;
 
     int idx = 0;
-    while(idx <= snapshot.data['total-user-amount']){
-      if(snapshot.data['$idx']['email'] == emailController.text) {
+    while(idx <= snapshot.data[1]['total-user-amount']){
+      if(snapshot.data[1]['$idx']['email'] == emailController.text) {
         print("SET STATE EMAIL FOUND");
         setState(() {
           emailFound = true;
@@ -239,7 +246,7 @@ class _LoginScreenState extends State<LoginScreen> {
               }
             },
             decoration: InputDecoration(
-              border: InputBorder.none,
+            //  border: InputBorder.none,
               contentPadding: EdgeInsets.only(top: 14.0),
               prefixIcon: Icon(
                 Icons.lock,
@@ -306,7 +313,7 @@ class _LoginScreenState extends State<LoginScreen> {
     print("1");
 
     return FutureBuilder(
-      future: userData(),
+      future: Future.wait([categoryData(),userData()]),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
         if(snapshot.connectionState == ConnectionState.done){
           if(snapshot.hasError){
@@ -315,13 +322,18 @@ class _LoginScreenState extends State<LoginScreen> {
           else if(snapshot.hasData){
             print("2");
             return Container(
-              padding: EdgeInsets.symmetric(vertical: 25.0),
+      
+              decoration: BoxDecoration(
+                color: Colors.deepPurple,
+                borderRadius: BorderRadius.circular(10),
+              ),
               width: double.infinity,
-              child: RaisedButton(
-                elevation: 5.0,
+              height: 50,
+              margin: EdgeInsets.only(top: 30,bottom: 30),
+              child: TextButton(
+
                 // THIS FUNCTION CONTROLS WHAT HAPPENS AFTER LOGIN BUTTON IS PRESSED
                 onPressed: () async {
-
 
                   passwordFound = validatePassword(snapshot);
                   emailFound = validateEmailEntered(snapshot);
@@ -344,7 +356,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         nameController.text,
                         emailController.text,
                         passwordController.text,
-                        snapshot.data['total-user-amount'] + 1,
+                        snapshot.data[1]['total-user-amount'] + 1,
                       );
 
                       print('2');
@@ -356,29 +368,148 @@ class _LoginScreenState extends State<LoginScreen> {
                       });
                     }
                     else{
-                      setState(() {
+
+                      print('1s');
+
+                      setState(() async {
                         loggedIn = true;
                         userLoggedInName = nameController.text;
                         userLoggedInEmail = emailController.text;
-                      });
 
-                      Navigator.pushNamed(context, '/payment');
+                        if(bookingClicked){
+                          print('2s');
+                          if(typeOfItemSelected == 'Services'){
+                            print("1");
+                            await databaseService.updateAppointmentStats(
+                              currentCategory,
+                              currentShopIndex,
+                              months[startMonth-1],
+                              snapshot.data![0]['$currentShopIndex']['appointments']['appointment-amount']+1,
+                            );
+
+
+                            print("2");
+
+                            await databaseService.addAppointment(
+                              globalDayWords,
+                              snapshot.data![1]['$userLoggedInIndex']['full-name'],
+                              snapshot.data![1]['$userLoggedInIndex']['email'],
+                              currentCategory,
+                              currentShopIndex,
+                              snapshot.data![0]['$currentShopIndex']['appointments']['appointment-amount']+1,
+                              snapshot.data![0]['$currentShopIndex']['appointments']['incomplete']+1,
+                              startYear,
+                              startMonth,
+                              startDay,
+                              startHour,
+                              startHourActual,
+                              startMinutes,
+                              startYear,
+                              startMonth,
+                              startDay,
+                              endHour,
+                              endHourActual,
+                              endMinutes,
+                              'blank',
+                              serviceBooked,
+                              globalServicePrice,
+                              globalServiceLinked?"none":snapshot.data![0]['$currentShopIndex']['staff-members']['$currentEmployeeIndex']['member-name'],
+                              globalServiceLinked?"none":snapshot.data![0]['$currentShopIndex']['staff-members']['$currentEmployeeIndex']['member-role'],
+                              'Services',
+                              serviceDuration,
+                              snapshot.data![1]["$userLoggedInIndex"]['appointment-amount']+1,
+                              globalStartTime,
+                              globalEndTime,
+                            );
+
+                            print("3");
+
+
+                            globalTime = '$globalStartTime-$globalEndTime';
+
+                            await databaseService.updateUserAppointments(
+                              snapshot.data![1]["$userLoggedInIndex"]['appointment-amount']+1,
+                              userLoggedInIndex,
+                              "${onCalender?globalDay:DateTime.now().day} ${onCalender?DateFormat.LLLL().format(timePicked):DateFormat.LLLL().format(DateTime.now())} ${onCalender?globalYear:DateTime.now().year}, $globalTime",
+                              serviceBooked,
+                              currentShop,
+                              serviceDuration,
+                              globalServiceLinked?"none":snapshot.data![0]['$currentShopIndex']['staff-members']['$currentEmployeeIndex']['member-name'],
+                              globalServicePrice,
+                            );
+
+                            print("4");
+                          }
+                          else{
+
+                            // TEST THIS PART
+                            await databaseService.addMember(
+                              currentCategory,
+                              currentShopIndex,
+                              snapshot.data![0]['$currentShopIndex']['members-amount']+1,
+                              snapshot.data![0]['$currentShopIndex']['memberships']['$currentMembershipIndex']['name'],
+                              snapshot.data![1]['$userLoggedInIndex']['full-name'],
+                              snapshot.data![1]['$userLoggedInIndex']['email'],
+                              DateTime.now().day,
+                              DateTime.now().month,
+                              DateTime.now().year,
+                            );
+
+                            await databaseService.addUserMembership(
+                              userLoggedInIndex,
+                              snapshot.data![1]['$userLoggedInIndex']['membership-amount']+1,
+                              snapshot.data![0]['$currentShopIndex']['memberships']['$currentMembershipIndex']['name'],
+                              currentShop,
+                              DateTime.now().day,
+                              DateTime.now().month,
+                              DateTime.now().year,
+                            );
+                          }
+
+                          int clientIndex = 0;
+                          bool clientFound = false;
+                          while(clientIndex <= snapshot.data![0]['$currentShopIndex']['client-amount']){
+
+                            if(snapshot.data![0]['$currentShopIndex']['clients']['$clientIndex']['email'] == snapshot.data![1]['$userLoggedInIndex']['email']){
+                              clientFound = true;
+                              break;
+                            }
+
+                            clientIndex++;
+                          }
+
+                          print("5");
+
+                          if(!clientFound){
+                            await databaseService.addClient(
+                              currentCategory,
+                              currentShopIndex,
+                              snapshot.data![0]['$currentShopIndex']['client-amount']+1,
+                              snapshot.data![1]['$userLoggedInIndex']['full-name'],
+                              snapshot.data![1]['$userLoggedInIndex']['email'],
+                            );
+                          }
+                          Navigator.pushNamed(context, '/booked');
+                        }
+                        else{
+                          print('3s');
+                          Navigator.pushNamed(context, '/bookingscreen');
+                        }
+
+
+                      });
                     }
                   }
 
                   print('Login Button Pressed');
                 },
-                padding: EdgeInsets.all(15.0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                color: Colors.deepPurple,
+
                 child: Text(
-                  onLoginScreen?'Login':'Sign up',
+                  onLoginScreen?'Log in':'Sign up',
                   style: TextStyle(
                     color: Colors.white,
                     letterSpacing: 1.5,
-                    fontSize: 20.0,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'OpenSans',
                   ),
@@ -466,14 +597,14 @@ class _LoginScreenState extends State<LoginScreen> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          onLoginScreen = false;
+          onLoginScreen = !onLoginScreen;
         });
       },
       child: RichText(
         text: TextSpan(
           children: [
             TextSpan(
-              text: 'Don\'t have an Account? ',
+              text: onLoginScreen?'Don\'t have an Account? ': 'Already have an account? ',
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 18.0,
@@ -481,7 +612,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             TextSpan(
-              text: 'Sign Up',
+              text: onLoginScreen?'Sign Up':'Log in',
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 18.0,
@@ -499,6 +630,16 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text(onLoginScreen?'Login':'Sign up', style: TextStyle(
+          color: Colors.black,
+        ),),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        automaticallyImplyLeading: true,
+        iconTheme: const IconThemeData(color: Colors.black),
+      ),
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.light,
         child: Form(
@@ -513,30 +654,22 @@ class _LoginScreenState extends State<LoginScreen> {
                     physics: AlwaysScrollableScrollPhysics(),
                     padding: EdgeInsets.symmetric(
                       horizontal: 40.0,
-                      vertical: 90.0,
+                      vertical: 30.0,
                     ),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Text(
-                          'Welcome to Servnn!',
-                          style: GoogleFonts.lato(textStyle: TextStyle(
-                            color: Colors.black,
-                            fontSize: 30.0,
-                            fontWeight: FontWeight.bold,
-                          ),),
+                        Container(
+                          width: 130,
+                          height: 130,
+                          child:  Image.asset('assets/all_images/SRVN-LOGO.png'),
                         ),
                         SizedBox(height: 10,),
-                        Text(
-                          onLoginScreen?'Login':'Sign up',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontFamily: 'OpenSans',
-                            fontSize: 25.0,
-                            // fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 30.0),
+
+                        Text(onLoginScreen?'Log in to Continue':'Register To Continue', style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),),
+                        SizedBox(height: 10,),
                         _buildNameTF(),
                         SizedBox(height: 30.0),
                         _buildEmailTF(),

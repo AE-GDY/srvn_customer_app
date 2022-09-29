@@ -70,14 +70,27 @@ class _PaymentMethodsState extends State<PaymentMethods> {
                             itemCount: savedCreditCards.length,
                             itemBuilder: (context,index){
                               return ListTile(
+                                onTap: (){
+                                  cashSelected = false;
+                                  nothingSelected = false;
+                                  cardSelected = savedCreditCards[index];
+                                  Navigator.popAndPushNamed(context, '/bookingscreen');
+                                },
                                 leading: Icon(Icons.credit_card ,color: Colors.blue,),
-                                title: Text(savedCreditCards[index].cardNumber),
+                                title: Text(savedCreditCards[index].nickname),
                               );
                             }),
                       ):Container(),
 
 
-                      snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['cash']?ListTile(
+                      snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['cash'] ||
+                          snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['both']?
+                      ListTile(
+                        onTap: (){
+                          cashSelected = true;
+                          nothingSelected = false;
+                          Navigator.popAndPushNamed(context, '/bookingscreen');
+                        },
                         leading: Icon(Icons.money_rounded,color: Colors.green,),
                         title: Text('Cash'),
                       ):savedCreditCards.length > 0?Container():Container(margin:EdgeInsets.all(0),child: Text('No Payment Methods Saved',textAlign: TextAlign.left,style: TextStyle(

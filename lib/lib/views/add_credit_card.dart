@@ -1,6 +1,10 @@
+import 'package:booking_app/models/credit_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:country_list_pick/country_list_pick.dart';
+import 'package:country_picker/country_picker.dart';
+
+import '../constants.dart';
 
 class AddCreditCard extends StatefulWidget {
   const AddCreditCard({Key? key}) : super(key: key);
@@ -12,6 +16,10 @@ class AddCreditCard extends StatefulWidget {
 class _AddCreditCardState extends State<AddCreditCard> {
 
   TextEditingController cardNumberController = TextEditingController();
+  TextEditingController cardExpiryController = TextEditingController();
+  String? cardCountry = '';
+  TextEditingController cardCVVController = TextEditingController();
+  TextEditingController cardNicknameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -79,16 +87,19 @@ class _AddCreditCardState extends State<AddCreditCard> {
                       SizedBox(height: 10,),
 
                       Container(
-                        width: 180,
+                        width: MediaQuery.of(context).size.width / 2.5,
                         height: 50,
                         decoration: BoxDecoration(
                           color: Colors.grey[300],
                         ),
-                        child: TextFormField(
-                          controller: cardNumberController,
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              labelText: 'MM/YY'
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: TextFormField(
+                            controller: cardExpiryController,
+                            decoration: InputDecoration(
+                                border: InputBorder.none,
+                                labelText: 'MM/YY'
+                            ),
                           ),
                         ),
                       ),
@@ -106,16 +117,19 @@ class _AddCreditCardState extends State<AddCreditCard> {
                       SizedBox(height: 10,),
 
                       Container(
-                        width: 180,
+                        width: MediaQuery.of(context).size.width / 2.5,
                         height: 50,
                         decoration: BoxDecoration(
                           color: Colors.grey[300],
                         ),
-                        child: TextFormField(
-                          controller: cardNumberController,
-                          decoration: InputDecoration(
-                              border: InputBorder.none,
-                              labelText: '123'
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: TextFormField(
+                            controller: cardCVVController,
+                            decoration: InputDecoration(
+                                border: InputBorder.none,
+                                labelText: '123'
+                            ),
                           ),
                         ),
                       ),
@@ -135,67 +149,44 @@ class _AddCreditCardState extends State<AddCreditCard> {
               ),),
 
               SizedBox(height: 10,),
-              /*
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                ),
-                child: TextFormField(
-                  controller: cardNumberController,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    prefixIcon: Icon(
-                      Icons.credit_card,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ),
-              ),
-
-              */
 
               Container(
                 width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
                 ),
-                child: CountryListPick(
+                child: Container(
+                  alignment: Alignment.centerLeft,
+                  child: CountryListPick(
 
-                  // if you need custome picker use this
-                  /*
-                  pickerBuilder: (context, CountryCode? countryCode){
-                     return Row(
-                       children: [
-                         Image.asset(
-                           countryCode?.flagUri,
-                           package: 'country_list_pick',
-                         ),
-                         Text(countryCode?.code),
-                         Text(countryCode?.dialCode),
-                       ],
-                     );
-                   },
-                  */
+                    appBar: AppBar(
+                      backgroundColor: Colors.deepPurple,
+                      title: const Text('Pick your country'),
+                    ),
 
-                  // Whether to allow the widget to set a custom UI overlay
-                  useUiOverlay: true,
-                  // Whether the country list should be wrapped in a SafeArea
-                  useSafeArea: false,
-                  theme: CountryTheme(
-                    isShowFlag: true, //show flag on dropdown
-                    isShowTitle: true, //show title on dropdown
-                    isShowCode: true, //show code on dropdown
-                    isDownIcon: true, //show down icon on dropdown
+                    theme: CountryTheme(
+                      //isShowFlag: true, //show flag on dropdown
+                      /*
+                      isShowTitle: true, //show title on dropdown
+                      isShowCode: true, //show code on dropdown
+                      isDownIcon: true,  //show down icon on dropdown
+                      */
+                    ),
+                    initialSelection: '+20', //inital selection,
+                    onChanged: (CountryCode? code) {
+
+                      cardCountry = code?.name!;
+
+                      print(code?.name); //get the country name eg: Antarctica
+                      print(code?.code); //get the country code like AQ for Antarctica
+                      print(code?.dialCode); //get the country dial code +672 for Antarctica
+                      print(code?.flagUri); //get the URL of flag. flags/aq.png for Antarctica
+                    },
                   ),
-                  initialSelection: '+20', //inital selection,
-                  onChanged: (CountryCode? code) {
-                    print(code?.name); //get the country name eg: Antarctica
-                    print(code?.code); //get the country code like AQ for Antarctica
-                    print(code?.dialCode); //get the country dial code +672 for Antarctica
-                    print(code?.flagUri); //get the URL of flag. flags/aq.png for Antarctica
-                  },
                 ),
               ),
+
+
 
 
 
@@ -212,11 +203,14 @@ class _AddCreditCardState extends State<AddCreditCard> {
                 decoration: BoxDecoration(
                   color: Colors.grey[300],
                 ),
-                child: TextFormField(
-                  controller: cardNumberController,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'eg. work card'
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: TextFormField(
+                    controller: cardNicknameController,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'eg. work card'
+                    ),
                   ),
                 ),
               ),
@@ -231,7 +225,45 @@ class _AddCreditCardState extends State<AddCreditCard> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: TextButton(
-                  onPressed: (){},
+                  onPressed: (){
+
+
+                    String cardNickname = "";
+
+                    String cardFinalFourNumbers = "";
+
+                    if(cardNicknameController.text.isEmpty){
+
+                      String cardNumber = cardNumberController.text;
+
+                      int cardNumberIndex = 0;
+                      while(cardNumberIndex < cardNumber.length){
+                        if(cardNumberIndex >= 12){
+                          cardFinalFourNumbers += cardNumber[cardNumberIndex];
+                        }
+                        cardNumberIndex++;
+                      }
+
+                      cardNickname = 'Visa ${cardFinalFourNumbers}';
+                    }
+                    else{
+                      cardNickname = cardNicknameController.text;
+                    }
+
+                    CreditCard newCard = CreditCard(
+                        cardCountry: cardCountry,
+                        cardNumber: cardNumberController.text,
+                        cardExpiry: cardExpiryController.text,
+                        cvc: cardCVVController.text,
+                        nickname: cardNickname,
+                    );
+
+
+                    savedCreditCards.add(newCard);
+
+                    Navigator.popAndPushNamed(context, '/payment-methods');
+
+                  },
                   child: Text('Add Card', style: TextStyle(
                     color: Colors.white,
                   ),),
