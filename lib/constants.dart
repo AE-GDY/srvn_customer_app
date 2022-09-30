@@ -48,6 +48,7 @@ var appointmentAmount = 0;
 var onBarberShop = false;
 var onSaloonShop = false;
 var onSpaShop = false;
+var onGymShop = false;
 var onCalender = false;
 var barberShopIndex = 0;
 var currentEmployeeIndex = 0;

@@ -55,6 +55,11 @@ class _HomeState extends State<Home> {
     doc('Spa').get()).data();
   }
 
+  Future<Map<String, dynamic>?> gymData() async {
+    return (await FirebaseFirestore.instance.collection('shops').
+    doc('Gym').get()).data();
+  }
+
   Future<Map<String, dynamic>?> topShopsData() async {
     return (await FirebaseFirestore.instance.collection('shops').
     doc('top-shops').get()).data();
@@ -312,6 +317,7 @@ class _HomeState extends State<Home> {
                         ),
                       ),
 
+                     /*
                       FutureBuilder(
                         future: userData(),
                         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
@@ -347,6 +353,7 @@ class _HomeState extends State<Home> {
                         },
 
                       ),
+                     */
                     ],
                   ),
                 ),
@@ -412,16 +419,16 @@ class _HomeState extends State<Home> {
                         fontSize: 20,
                         color: Colors.black
                     ),),
-                    Text("See More"),
+                    //Text("See More"),
                   ],
                 ),
               ),
               SizedBox(height: 0,),
               Container(
-                height: 140,
+                height: MediaQuery.of(context).size.height / 4.7,
                 child:ListView.builder(
                   shrinkWrap: true,
-                  itemCount: 3,
+                  itemCount: categoryList.length,
                   scrollDirection: Axis.horizontal,
                   physics: ScrollPhysics(),
                   itemBuilder: (context, index){
@@ -435,12 +442,12 @@ class _HomeState extends State<Home> {
                           SizedBox(height: 5,),
                           Card(
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                            elevation: 2,
+                            elevation: 3,
                             child: Container(
-                              height: 70,
-                              width: 70,
+                              height: 80,
+                              width: 80,
                               padding: EdgeInsets.all((MediaQuery.of(context).size.width / 100) * 2),
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -454,6 +461,7 @@ class _HomeState extends State<Home> {
                                       onBarberShop = false;
                                       onSpaShop = false;
                                       onSaloonShop = true;
+                                      onGymShop = false;
                                     });
                                   }
                                   else if(category.title == "Barbershop"){
@@ -462,6 +470,7 @@ class _HomeState extends State<Home> {
                                       onBarberShop = true;
                                       onSpaShop = false;
                                       onSaloonShop = false;
+                                      onGymShop = false;
                                     });
 
                                   }
@@ -471,9 +480,22 @@ class _HomeState extends State<Home> {
                                       onBarberShop = false;
                                       onSpaShop = true;
                                       onSaloonShop = false;
+                                      onGymShop = false;
                                     });
 
                                   }
+
+                                  else if(category.title == "Gym"){
+                                    setState(() {
+                                      currentCategory = "Gym";
+                                      onBarberShop = false;
+                                      onSpaShop = false;
+                                      onSaloonShop = false;
+                                      onGymShop = true;
+                                    });
+
+                                  }
+
                                   Navigator.pushNamed(context, '/shoplist');
                                 },
                                 child: SvgPicture.asset(category.icon),
@@ -494,7 +516,7 @@ class _HomeState extends State<Home> {
 
 
               FutureBuilder(
-                future: Future.wait([barbershopData(),hairsalonData(),spaData()]),
+                future: Future.wait([barbershopData(),hairsalonData(),spaData(), gymData()]),
                 builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                   if(snapshot.connectionState == ConnectionState.done){
                     if(snapshot.hasError){
@@ -519,12 +541,25 @@ class _HomeState extends State<Home> {
                                     fontSize: 20,
                                     color: Colors.black
                                 ),),
-                                Text("See More"),
+                                TextButton(onPressed: (){
+
+                                  currentCategory = "Barbershop";
+                                  onBarberShop = true;
+                                  onSpaShop = false;
+                                  onSaloonShop = false;
+                                  onGymShop = false;
+
+
+                                  Navigator.pushNamed(context, '/shoplist');
+
+                                }, child: Text("See More", style: TextStyle(
+                                  color: Colors.black,
+                                ),),),
                               ],
                             ),
                           ),
                           Container(
-                            height: 150,
+                            height: MediaQuery.of(context).size.height / 4.7,
                             alignment: Alignment.centerLeft,
                             child: ListView.builder(
                               shrinkWrap: true,
@@ -536,12 +571,15 @@ class _HomeState extends State<Home> {
 
                                 dynamic shopRatingRounded = currentShopRating.toStringAsFixed(1);
 
+
+
                                 return shopCard(
                                   shopName: snapshot.data[0]['$index']['shop-name'],
                                   shopAddress: snapshot.data[0]['$index']['shop-address'],
                                   shopImageUrl: snapshot.data[0]['$index']['images']['${0}'],
                                   shopRating: '$shopRatingRounded',
                                   shopIndex: index,
+                                  category: 'Barbershop',
                                 );
                               },
                             ),
@@ -557,12 +595,25 @@ class _HomeState extends State<Home> {
                                     fontSize: 20,
                                     color: Colors.black
                                 ),),
-                                Text("See More"),
+                                TextButton(onPressed: (){
+
+                                  currentCategory = "Hair Salon";
+                                  onBarberShop = false;
+                                  onSpaShop = false;
+                                  onSaloonShop = true;
+                                  onGymShop = false;
+
+
+                                  Navigator.pushNamed(context, '/shoplist');
+
+                                }, child: Text("See More", style: TextStyle(
+                                  color: Colors.black,
+                                ),),),
                               ],
                             ),
                           ),
                           Container(
-                            height: 150,
+                            height: MediaQuery.of(context).size.height / 4.7,
                             alignment: Alignment.centerLeft,
                             child: ListView.builder(
                               shrinkWrap: true,
@@ -575,6 +626,7 @@ class _HomeState extends State<Home> {
                                   shopImageUrl: snapshot.data[1]['$index']['images']['${0}'],
                                   shopRating: '${snapshot.data[1]['$index']['reviews-rating']}',
                                   shopIndex: index,
+                                  category: 'Hair Salon',
                                 );
                               },
                             ),
@@ -591,13 +643,26 @@ class _HomeState extends State<Home> {
                                     fontSize: 20,
                                     color: Colors.black
                                 ),),
-                                Text("See More"),
+                                TextButton(onPressed: (){
+
+                                  currentCategory = "Spa";
+                                  onBarberShop = false;
+                                  onSpaShop = true;
+                                  onSaloonShop = false;
+                                  onGymShop = false;
+
+
+                                  Navigator.pushNamed(context, '/shoplist');
+
+                                }, child: Text("See More", style: TextStyle(
+                                  color: Colors.black,
+                                ),),),
                               ],
                             ),
                           ),
                           Container(
                             alignment: Alignment.centerLeft,
-                            height: 150,
+                            height: MediaQuery.of(context).size.height / 4.7,
                             child: ListView.builder(
                               shrinkWrap: true,
                               scrollDirection: Axis.horizontal,
@@ -609,10 +674,59 @@ class _HomeState extends State<Home> {
                                   shopImageUrl: snapshot.data[2]['$index']['images']['${0}'],
                                   shopRating: '${snapshot.data[2]['$index']['reviews-rating']}',
                                   shopIndex: index,
+                                  category: 'Spa',
                                 );
                               },
                             ),
                           ),
+
+                          SizedBox(height: 20,),
+                          Padding(
+                            padding: EdgeInsets.all(20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("Top Gyms", style: TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.black
+                                ),),
+                                TextButton(onPressed: (){
+
+                                  currentCategory = "Gym";
+                                  onBarberShop = false;
+                                  onSpaShop = false;
+                                  onSaloonShop = false;
+                                  onGymShop = true;
+
+
+                                  Navigator.pushNamed(context, '/shoplist');
+
+                                }, child: Text("See More", style: TextStyle(
+                                  color: Colors.black,
+                                ),),),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            alignment: Alignment.centerLeft,
+                            height: MediaQuery.of(context).size.height / 4.7,
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              scrollDirection: Axis.horizontal,
+                              itemCount: snapshot.data[3]['total-shop-amount']+1,
+                              itemBuilder: (context, index){
+                                return shopCard(
+                                  shopName: snapshot.data[3]['$index']['shop-name'],
+                                  shopAddress: snapshot.data[3]['$index']['shop-address'],
+                                  shopImageUrl: snapshot.data[3]['$index']['images']['${0}'],
+                                  shopRating: '${snapshot.data[3]['$index']['reviews-rating']}',
+                                  shopIndex: index,
+                                  category: 'Gym',
+                                );
+                              },
+                            ),
+                          ),
+
                         ],
                       );
                     }

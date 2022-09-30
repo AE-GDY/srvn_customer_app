@@ -942,136 +942,243 @@ class _BarberTimeState extends State<BarberTime> {
 
                   // MEMBERSHIPS LOGIC
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
+                  return Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height*1.2,
+                    child: SingleChildScrollView(
 
-                      SizedBox(height: 30,),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
 
-                      Container(
-                        margin: EdgeInsets.all(20),
-                        child: Text('You are one step closer to becoming a member!', style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      SizedBox(height: 35,),
+                          Container(
+                            width: MediaQuery.of(context).size.width / 2,
+                            height: MediaQuery.of(context).size.height / 6,
+                            child: Image.network(
+                              snapshot.data['$currentShopIndex']['images']['${-1}'],
+                              alignment: Alignment.center,
 
-
-                      Text('Membership Name', style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),),
-                      SizedBox(height: 5,),
-
-                      Text(snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['name'], style: TextStyle(
-                        fontSize: 16,
-                      ),),
-
-
-
-                      SizedBox(height: 20,),
-                      Text('Membership Price', style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),),
-                      SizedBox(height: 5,),
-                      Text('${snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['price']} EGP', style: TextStyle(
-                        fontSize: 16,
-                      ),),
-                      SizedBox(height: 20,),
-
-                      Text('Membership Services', style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),),
-                      SizedBox(height: 5,),
-
-                      Container(
-                        alignment: Alignment.center,
-                        width: MediaQuery.of(context).size.width,
-                        height: 100,
-                        child: ListView.builder(
-                            itemCount: snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['selected-services-amount'] ,
-                            itemBuilder: (context,index){
-                              return Center(
-                                child: Container(
-                                  margin: EdgeInsets.all(5),
-                                  child: Text(snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['selected-services'][index]),
-                                ),
-                              );
-                            }
                             ),
-                      ),
+                          ),
 
-                      SizedBox(height: 10,),
-                      (snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['discounted-amount'] > 0)?Text('Discounted Services', style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),):Container(),
-                      (snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['discounted-amount'] > 0)?
-                      SizedBox(height: 5,):Container(),
-                      (snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['discounted-amount'] > 0)?
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: 100,
-                        child: ListView.builder(
-                            itemCount: snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['discounted-amount'] ,
-                            itemBuilder: (context,index){
-                              return Container(
-                                margin: EdgeInsets.all(5),
-                                child: Text(snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['selected-discounted-services'][index]),
-                              );
-                            }
-                        ),
-                      ):Container(),
-                      SizedBox(height: 10,),
+                          SizedBox(height: 35,),
 
-                      Text('Membership Duration', style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),),
-                      SizedBox(height: 5,),
-                      Text('${snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['duration']} month/s', style: TextStyle(
-                        fontSize: 16,
-                      ),),
-
-                      SizedBox(height: 40,),
-
-                      Container(
-                        width: 300,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.deepPurple,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: TextButton(
-                          onPressed: (){
-
-                            if(loggedIn){
-                              Navigator.pushNamed(context, '/payment');
-                            }
-                            else{
-                              Navigator.pushNamed(context, '/login');
-                            }
+                          Container(
+                            margin: EdgeInsets.all(20),
+                            child: Text('You are one step closer to becoming a member!', style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          //SizedBox(height: 35,),
 
 
-
-                          },
-                          child: Text("Purchase Membership", style: TextStyle(
-                            color: Colors.white,
+                          Text('Membership Name', style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),),
-                        ),
+                          SizedBox(height: 5,),
+
+                          Text(snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['name'], style: TextStyle(
+                            fontSize: 16,
+                          ),),
+
+                          SizedBox(height: 20,),
+
+                          Text('Membership Services', style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),),
+                          SizedBox(height: 5,),
+
+                          Container(
+                            alignment: Alignment.center,
+                            width: MediaQuery.of(context).size.width,
+                            height: 100,
+                            child: ListView.builder(
+                                itemCount: snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['selected-services-amount'] ,
+                                itemBuilder: (context,index){
+                                  return Center(
+                                    child: Container(
+                                      margin: EdgeInsets.all(5),
+                                      child: Text(snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['selected-services'][index]),
+                                    ),
+                                  );
+                                }
+                                ),
+                          ),
+
+                          SizedBox(height: 10,),
+                          (snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['discounted-amount'] > 0)?Text('Discounted Services', style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),):Container(),
+                          (snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['discounted-amount'] > 0)?
+                          SizedBox(height: 5,):Container(),
+                          (snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['discounted-amount'] > 0)?
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: 100,
+                            child: ListView.builder(
+                                itemCount: snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['discounted-amount'] ,
+                                itemBuilder: (context,index){
+                                  return Container(
+                                    margin: EdgeInsets.all(5),
+                                    child: Text(snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['selected-discounted-services'][index]),
+                                  );
+                                }
+                            ),
+                          ):Container(),
+
+                          Text('Membership Duration', style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),),
+                          SizedBox(height: 5,),
+                          Text('${snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['duration']} month/s', style: TextStyle(
+                            fontSize: 16,
+                          ),),
+
+                          SizedBox(height: 40,),
+
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height / 3,
+                            child: Card(
+                              elevation: 10.0,
+                              child: Column(
+                                children: [
+
+                                  Row(
+                                    children: [
+                                      Container(
+                                        margin: EdgeInsets.all(10),
+                                        child: Text('Payment Method', style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                          textAlign: TextAlign.left,
+                                        ),
+                                      ),
+
+                                      TextButton(
+                                        onPressed: (){
+
+                                          if(loggedIn){
+                                            Navigator.pushNamed(context, '/add-card');
+                                          }
+                                          else{
+                                            Navigator.pushNamed(context, '/login');
+                                          }
+
+                                        },
+                                        child: Row(
+                                          children: [
+
+                                            Icon(Icons.add,size: 20,color: Colors.black,),
+
+                                            Text('Add Credit Card', style: TextStyle(
+                                              color: Colors.black,
+                                            ),),
+
+
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  ),
+
+                                  SizedBox(height: 10,),
+
+                                  Container(
+                                    margin: EdgeInsets.only(right: 30),
+                                    child: TextButton(
+                                      onPressed: (){
+                                        if(loggedIn){
+                                          Navigator.pushNamed(context, '/payment-methods');
+                                        }
+                                        else{
+                                          Navigator.pushNamed(context, '/login');
+                                        }
+                                      },
+                                      child: ListTile(
+                                        leading: Icon(Icons.credit_card ,color: Colors.blue,),
+                                        title: savedCreditCards.length > 0?Text(savedCreditCards[0].nickname):Text('No Credit Card Added'),
+                                        trailing: Icon(Icons.arrow_right,color:Colors.black,),
+                                      ),
+                                    ),
+                                  ),
+
+                                  SizedBox(height: 10,),
+
+
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        width: MediaQuery.of(context).size.width / 3,
+                                        height: 50,
+                                        margin: EdgeInsets.all(10),
+                                        child: ListTile(
+                                          title:   Text('$globalServicePrice EGP', style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold
+                                          ),),
+                                        ),
+                                      ),
+
+                                      Expanded(
+                                        child: Container(
+                                          margin: EdgeInsets.only(right: 10),
+                                          alignment: Alignment.center,
+                                          width: 200,
+                                          height: 50,
+                                          decoration: BoxDecoration(
+                                            color: cardSelected != null?Colors.deepPurple:Colors.grey,
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: TextButton(
+                                            onPressed: (){
+
+
+                                              if(cardSelected != null){
+                                                if(loggedIn){
+                                                  Navigator.pushNamed(context, '/payment');
+                                                }
+                                                else{
+                                                  Navigator.pushNamed(context, '/login');
+                                                }
+                                              }
+
+
+
+                                            },
+                                            child: Text("Purchase", style: TextStyle(
+                                              color: Colors.white,
+                                            ),),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+
+                                ],
+                              ),
+                            ),
+                          ),
+
+
+
+                          SizedBox(height: 50,),
+
+
+                        ],
                       ),
-
-
-
-                      SizedBox(height: 50,),
-
-
-                    ],
+                    ),
                   );
 
 

@@ -28,4 +28,10 @@ List<Category> categoryList = [
     subtitle: "15",
     color: kIndigo,
   ),
+  Category(
+    icon: "assets/all_images/gym_icon.svg",
+    title: "Gym",
+    subtitle: "15",
+    color: kIndigo,
+  ),
 ];

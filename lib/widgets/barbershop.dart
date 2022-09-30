@@ -8,6 +8,7 @@ class shopCard extends StatefulWidget {
   final String shopAddress;
   final String shopImageUrl;
   final String shopRating;
+  final String category;
   final int shopIndex;
   shopCard({
     required this.shopName,
@@ -15,6 +16,7 @@ class shopCard extends StatefulWidget {
     required this.shopImageUrl,
     required this.shopRating,
     required this.shopIndex,
+    required this.category,
   });
 
   @override
@@ -37,12 +39,14 @@ class _shopCardState extends State<shopCard> {
             child: Container(
               child: TextButton(
                 onPressed: (){
-                  setState(() {
-                    currentShopIndex = widget.shopIndex;
-                    onBarberShop = true;
-                  });
+
+                  currentShopIndex = widget.shopIndex;
+                  currentCategory = widget.category;
+                  currentShop = widget.shopName;
+                  currentAddress = widget.shopAddress;
+
                   Navigator.pushNamed(context, '/currentshop');
-                  print("index: $barberShopIndex");
+
                 },
                 child: Container(
                   width: double.infinity,

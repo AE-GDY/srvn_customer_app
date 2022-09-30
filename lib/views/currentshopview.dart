@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:booking_app/constants.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 import 'package:easy_image_viewer/easy_image_viewer.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 class CurrentShop extends StatefulWidget {
 
@@ -25,6 +27,7 @@ class _CurrentShopState extends State<CurrentShop> {
     'Devarana Spa',
     'Devarana Sauna'
   ];
+
 
   Future<Map<String, dynamic>?> categoryData() async {
     return (await FirebaseFirestore.instance.collection('shops').
@@ -73,6 +76,7 @@ class _CurrentShopState extends State<CurrentShop> {
 
                       if(snapshot.data['$currentShopIndex']['total-images'] > 0){
                         return Container(
+                          width: MediaQuery.of(context).size.width,
                           height: MediaQuery.of(context).size.height / 3 + 20,
                           child: ListView.builder(
                               scrollDirection: Axis.horizontal,
@@ -85,6 +89,7 @@ class _CurrentShopState extends State<CurrentShop> {
 
                                 return Image.network(
                                   url,
+                                  width: MediaQuery.of(context).size.width,
                                   alignment: Alignment.center,
                                   fit: BoxFit.fitWidth,
                                 );
@@ -561,32 +566,75 @@ class _CurrentShopState extends State<CurrentShop> {
 
 
           FutureBuilder(
-            future: categoryData(),
-            builder: (BuildContext context, AsyncSnapshot<Map<String, dynamic>?> snapshot) {
+            future: Future.wait([categoryData(),userData()]),
+            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
               if(snapshot.connectionState == ConnectionState.done){
                 if(snapshot.hasError){
                   return const Text("There is an error");
                 }
                 else if(snapshot.hasData){
-                  return Container(
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: snapshot.data!['$currentShopIndex']['memberships-amount']+1,
-                      scrollDirection: Axis.vertical,
-                      physics: ScrollPhysics(),
-                      itemBuilder: (context, index){
 
-                        return MembershipTile(
-                            snapshot.data!['$currentShopIndex']['memberships']['$index']['name'],
-                            snapshot.data!['$currentShopIndex']['memberships']['$index']['price'],
-                            snapshot.data!['$currentShopIndex']['memberships']['$index']['duration'],
-                            snapshot.data!['$currentShopIndex']['memberships']['$index']['selected-services'],
-                            snapshot.data!['$currentShopIndex']['services']['$index']['selected-discounted-services'],
-                            index
-                        );
-                      },
-                    ),
-                  );
+                  bool userIsMember = false;
+                  int membershipIndex = 0;
+
+
+                  while(membershipIndex <= snapshot.data[1]['$userLoggedInIndex']['membership-amount']){
+
+                    if(snapshot.data[1]['$userLoggedInIndex']['memberships']['$membershipIndex']['membership-shop'] == currentShop){
+                      userIsMember = true;
+                      break;
+                    }
+
+                    membershipIndex++;
+                  }
+
+
+                  if(userIsMember){
+                    // THIS PART NEEDS TO CHANGE
+
+                    return Container(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: snapshot.data![0]['$currentShopIndex']['memberships-amount']+1,
+                        scrollDirection: Axis.vertical,
+                        physics: ScrollPhysics(),
+                        itemBuilder: (context, index){
+
+                          return MembershipTile(
+                              snapshot.data![0]['$currentShopIndex']['memberships']['$index']['name'],
+                              snapshot.data![0]['$currentShopIndex']['memberships']['$index']['price'],
+                              snapshot.data![0]['$currentShopIndex']['memberships']['$index']['duration'],
+                              snapshot.data![0]['$currentShopIndex']['memberships']['$index']['selected-services'],
+                              snapshot.data![0]['$currentShopIndex']['services']['$index']['selected-discounted-services'],
+                              index
+                          );
+                        },
+                      ),
+                    );
+                  }
+                  else{
+                    return Container(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: snapshot.data![0]['$currentShopIndex']['memberships-amount']+1,
+                        scrollDirection: Axis.vertical,
+                        physics: ScrollPhysics(),
+                        itemBuilder: (context, index){
+
+                          return MembershipTile(
+                              snapshot.data![0]['$currentShopIndex']['memberships']['$index']['name'],
+                              snapshot.data![0]['$currentShopIndex']['memberships']['$index']['price'],
+                              snapshot.data![0]['$currentShopIndex']['memberships']['$index']['duration'],
+                              snapshot.data![0]['$currentShopIndex']['memberships']['$index']['selected-services'],
+                              snapshot.data![0]['$currentShopIndex']['services']['$index']['selected-discounted-services'],
+                              index
+                          );
+                        },
+                      ),
+                    );
+                  }
+
+
                 }
               }
               return (const Center(
@@ -761,6 +809,8 @@ class _CurrentShopState extends State<CurrentShop> {
                 itemBuilder: (BuildContext context, int index) {
                   String url = snapshot.data['$currentShopIndex']['images']['$index'];
                   return Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height / 3.5,
                     margin: EdgeInsets.all(20),
                     child: Material(
                       child: InkWell(
@@ -771,8 +821,6 @@ class _CurrentShopState extends State<CurrentShop> {
                         },
                         child: Image.network(
                           url,
-                          height: 250,
-                          width: 50,
                           alignment: Alignment.center,
                           fit: BoxFit.fitWidth,
                         ),
@@ -823,20 +871,27 @@ class _CurrentShopState extends State<CurrentShop> {
                     ),),
                     SizedBox(height: 10,),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text("${snapshot.data['$currentShopIndex']['contact-number']}",style: TextStyle(
                           fontSize: 16,
                         ),),
-                        SizedBox(width: 180,),
                         Container(
                           width: 90,
                           height: 40,
                           decoration: BoxDecoration(
-                            color: Colors.blue,
+                            color: Colors.deepPurple,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: TextButton(
-                            onPressed: (){},
+                            onPressed: () async {
+
+                              String contactNumber = snapshot.data['$currentShopIndex']['contact-number'];
+
+                              launch('tel://$contactNumber');
+
+
+                            },
                             child: Text("Call",style: TextStyle(
                               color: Colors.white,
                             ),),
@@ -851,25 +906,24 @@ class _CurrentShopState extends State<CurrentShop> {
                     Container(
                       margin: EdgeInsets.all(10),
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text("Payment and Cancellation Policy",style: TextStyle(
                             fontSize: 16,
                           ),),
-                          SizedBox(width: 60,),
                           Icon(Icons.arrow_forward),
                         ],
                       ),
                     ) ,
-                    SizedBox(height: 10,),
-                    SizedBox(height: 10,),
+                    SizedBox(height: 20,),
                     Container(
                       margin: EdgeInsets.all(10),
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text("Report",style: TextStyle(
                             fontSize: 16,
                           ),),
-                          SizedBox(width: 270,),
                           Icon(Icons.arrow_forward),
                         ],
                       ),

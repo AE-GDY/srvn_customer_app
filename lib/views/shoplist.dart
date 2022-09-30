@@ -314,6 +314,7 @@ class _shopListState extends State<shopList> {
                                 focusedBorder: InputBorder.none,
                                 hintText: onBarberShop?"Search For Barbershop":
                                 onSaloonShop?"Search For Hairsalon":
+                                onGymShop?"Search For Gym":
                                 "Search For Spa",
                                 prefixIcon: Icon(Icons.search),
                               ),
