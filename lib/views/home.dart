@@ -1,6 +1,7 @@
 import 'package:booking_app/constants.dart';
 import 'package:booking_app/models/barbershop.dart';
 import 'package:booking_app/models/category.dart';
+import 'package:booking_app/models/shop_model.dart';
 import 'package:booking_app/models/spashop.dart';
 import 'package:booking_app/services/database.dart';
 import 'package:booking_app/widgets/barbershop.dart';
@@ -22,12 +23,22 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
 
-  late  List<String> shopServices_name = [];
+  late  List<String> shopServices_name = [
+    'Massage',
+    'Spa',
+    'Jacuzzi',
+    'Haircut',
+    'Beard'
+  ];
+
+
+  List<Shop> allShops = [];
+
   String selectedplace='';
   final List<String> suggestedServices =[
-    'massage',
-    'spa',
-    'jacosey'
+    'Massage',
+    'Spa',
+    'Jacuzzi'
   ];
 
   bool initialEdit = true;
@@ -291,30 +302,75 @@ class _HomeState extends State<Home> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        width: 250,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          //color: Colors.grey.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: TextField(
-                          readOnly: true,
-                          textAlignVertical: TextAlignVertical.center,
-                          onTap: () async {
-                            final finalresult = await showSearch(context: context, delegate: search_service(allServices: shopServices_name, servicesSuggestion: suggestedServices));
-                            setState(() {
-                              selectedplace=finalresult!;
-                              print(selectedplace);
-                            });
-                          },
-                          decoration: InputDecoration(
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            hintText: "Search for Service",
-                            prefixIcon: Icon(Icons.search),
-                          ),
-                        ),
+                      FutureBuilder(
+                        future: Future.wait([barbershopData(),hairsalonData(),spaData(),gymData()]),
+                        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                          if(snapshot.connectionState == ConnectionState.done){
+                            if(snapshot.hasError){
+                              return const Text("There is an error");
+                            }
+                            else if(snapshot.hasData){
+
+                              allShops = [];
+
+                              int categoryIndex = 0;
+                              while(categoryIndex < categoryList.length){
+
+                                int shopIndex = 0;
+                                while(shopIndex <= snapshot.data[categoryIndex]['total-shop-amount']){
+
+                                  dynamic currentRating = snapshot.data[categoryIndex]['$shopIndex']['reviews-rating'];
+
+                                  dynamic ratingRounded = currentRating.toStringAsFixed(1);
+
+                                  Shop currentShop = Shop(
+                                      shopName: snapshot.data[categoryIndex]['$shopIndex']['shop-name'],
+                                      shopCategory: categoryList[categoryIndex].title,
+                                      shopAddress: snapshot.data[categoryIndex]['$shopIndex']['shop-address'],
+                                      shopReviewAmount: snapshot.data[categoryIndex]['$shopIndex']['reviews-amount']+1,
+                                      shopRating: ratingRounded,
+                                      shopIndex: shopIndex
+                                  );
+
+                                  allShops.add(currentShop);
+
+                                  shopIndex++;
+                                }
+
+                                categoryIndex++;
+                              }
+
+
+                              return Container(
+                                width: 250,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  //color: Colors.grey.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: TextField(
+                                  readOnly: true,
+                                  textAlignVertical: TextAlignVertical.center,
+                                  onTap: () async {
+                                    final finalresult = await showSearch(context: context, delegate: search_service(allServices: shopServices_name, shops: allShops));
+                                    setState(() {
+                                      selectedplace=finalresult!;
+                                      print(selectedplace);
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    enabledBorder: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    hintText: "Search for Service",
+                                    prefixIcon: Icon(Icons.search),
+                                  ),
+                                ),
+                              );
+                            }
+                          }
+                          return const CircularProgressIndicator();
+                        },
+
                       ),
 
                      /*

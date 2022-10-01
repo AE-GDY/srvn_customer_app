@@ -381,6 +381,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           onSettings = false;
                           Navigator.popAndPushNamed(context, '/');
                         }
+                        else if(onMembership){
+                          onMembership = false;
+                          Navigator.pushNamed(context, '/currentshop');
+                        }
                         else if(bookingClicked){
                           print('2s');
                           if(typeOfItemSelected == 'Services'){

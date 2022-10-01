@@ -1,3 +1,4 @@
+import 'package:booking_app/constants.dart';
 import 'package:booking_app/widgets/bottomnavigator.dart';
 import 'package:flutter/material.dart';
 
@@ -44,11 +45,17 @@ class _ProfileState extends State<Profile> {
                     });
 
                     if(mainSettings[index] == 'Log in'){
+
+                      if(loggedIn){
+                        loggedIn = false;
+                      }
+
                       Navigator.pushNamed(context, '/login');
                     }
                   },
                   child: ListTile(
-                    title: Text("${mainSettings[index]}", style: TextStyle(
+                    title: Text((mainSettings[index] == 'Log in' && !loggedIn)?"${mainSettings[index]}":
+                      (mainSettings[index] == 'Log in' && loggedIn)?'Log out':"${mainSettings[index]}", style: TextStyle(
                       fontSize: 20,
                     ),),
                     trailing: Icon(Icons.keyboard_arrow_right),),

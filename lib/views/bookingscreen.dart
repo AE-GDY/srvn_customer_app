@@ -7,6 +7,7 @@ import 'package:booking_app/constants.dart';
 import 'dart:ui';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 
@@ -944,7 +945,7 @@ class _BarberTimeState extends State<BarberTime> {
 
                   return Container(
                     width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height*1.2,
+                    height: MediaQuery.of(context).size.height*2,
                     child: SingleChildScrollView(
 
                       child: Column(
@@ -952,8 +953,8 @@ class _BarberTimeState extends State<BarberTime> {
                         children: [
 
                           Container(
-                            width: MediaQuery.of(context).size.width / 2,
-                            height: MediaQuery.of(context).size.height / 6,
+                            width: MediaQuery.of(context).size.width / 2.5,
+                            height: MediaQuery.of(context).size.height / 7,
                             child: Image.network(
                               snapshot.data['$currentShopIndex']['images']['${-1}'],
                               alignment: Alignment.center,
@@ -964,9 +965,9 @@ class _BarberTimeState extends State<BarberTime> {
                           SizedBox(height: 35,),
 
                           Container(
-                            margin: EdgeInsets.all(20),
+                            margin: EdgeInsets.only(bottom: 30),
                             child: Text('You are one step closer to becoming a member!', style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 22,
                               fontWeight: FontWeight.bold,
                             ),
                               textAlign: TextAlign.center,
@@ -976,19 +977,19 @@ class _BarberTimeState extends State<BarberTime> {
 
 
                           Text('Membership Name', style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),),
                           SizedBox(height: 5,),
 
                           Text(snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['name'], style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 18,
                           ),),
 
                           SizedBox(height: 20,),
 
                           Text('Membership Services', style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),),
                           SizedBox(height: 5,),
@@ -996,14 +997,17 @@ class _BarberTimeState extends State<BarberTime> {
                           Container(
                             alignment: Alignment.center,
                             width: MediaQuery.of(context).size.width,
-                            height: 100,
+                            //height: 100,
                             child: ListView.builder(
+                                shrinkWrap: true,
                                 itemCount: snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['selected-services-amount'] ,
                                 itemBuilder: (context,index){
                                   return Center(
                                     child: Container(
-                                      margin: EdgeInsets.all(5),
-                                      child: Text(snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['selected-services'][index]),
+                                      margin: EdgeInsets.only(bottom: 10),
+                                      child: Text(snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['selected-services'][index],style: TextStyle(
+                                        fontSize: 18,
+                                      ),),
                                     ),
                                   );
                                 }
@@ -1012,33 +1016,53 @@ class _BarberTimeState extends State<BarberTime> {
 
                           SizedBox(height: 10,),
                           (snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['discounted-amount'] > 0)?Text('Discounted Services', style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),):Container(),
                           (snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['discounted-amount'] > 0)?
                           SizedBox(height: 5,):Container(),
                           (snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['discounted-amount'] > 0)?
                           Container(
+                            alignment: Alignment.center,
                             width: MediaQuery.of(context).size.width,
-                            height: 100,
+                           // height: 100,
                             child: ListView.builder(
+                                shrinkWrap: true,
                                 itemCount: snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['discounted-amount'] ,
                                 itemBuilder: (context,index){
-                                  return Container(
-                                    margin: EdgeInsets.all(5),
-                                    child: Text(snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['selected-discounted-services'][index]),
+                                  return Center(
+                                    child: Container(
+                                      margin: EdgeInsets.only(bottom: 10),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Container(
+                                            margin: EdgeInsets.all(0),
+                                            child: Text('${snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['selected-discounted-services'][index]} ',style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 18,
+                                            ),),
+                                          ),
+                                          Text(' ${snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['selected-discounted-services-percentages'][index]}%', style: TextStyle(
+                                            fontSize: 18,
+                                            color: Colors.red,
+                                          ),),
+                                        ],
+                                      ),
+                                    ),
                                   );
                                 }
                             ),
                           ):Container(),
 
+                          SizedBox(height: 10,),
                           Text('Membership Duration', style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),),
                           SizedBox(height: 5,),
                           Text('${snapshot.data['$currentShopIndex']['memberships']['$currentMembershipIndex']['duration']} month/s', style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 18,
                           ),),
 
                           SizedBox(height: 40,),
@@ -1131,35 +1155,91 @@ class _BarberTimeState extends State<BarberTime> {
                                       ),
 
                                       Expanded(
-                                        child: Container(
-                                          margin: EdgeInsets.only(right: 10),
-                                          alignment: Alignment.center,
-                                          width: 200,
-                                          height: 50,
-                                          decoration: BoxDecoration(
-                                            color: cardSelected != null?Colors.deepPurple:Colors.grey,
-                                            borderRadius: BorderRadius.circular(10),
-                                          ),
-                                          child: TextButton(
-                                            onPressed: (){
-
-
-                                              if(cardSelected != null){
-                                                if(loggedIn){
-                                                  Navigator.pushNamed(context, '/payment');
-                                                }
-                                                else{
-                                                  Navigator.pushNamed(context, '/login');
-                                                }
+                                        child: FutureBuilder(
+                                          future: Future.wait([categoryData(),userData()]),
+                                          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                                            if(snapshot.connectionState == ConnectionState.done){
+                                              if(snapshot.hasError){
+                                                return const Text("There is an error");
                                               }
+                                              else if(snapshot.hasData){
+                                                return Container(
+                                                  margin: EdgeInsets.only(right: 10),
+                                                  alignment: Alignment.center,
+                                                  width: 200,
+                                                  height: 50,
+                                                  decoration: BoxDecoration(
+                                                    color: cardSelected != null?Colors.deepPurple:Colors.grey,
+                                                    borderRadius: BorderRadius.circular(10),
+                                                  ),
+                                                  child: TextButton(
+                                                    onPressed: () async {
+
+
+                                                      if(cardSelected != null){
+
+                                                        await databaseService.addMember(
+                                                          currentCategory,
+                                                          currentShopIndex,
+                                                          snapshot.data[0]['$currentShopIndex']['members-amount']+1,
+                                                          snapshot.data[0]['$currentShopIndex']['memberships']['$currentMembershipIndex']['name'],
+                                                          snapshot.data[1]['$userLoggedInIndex']['full-name'],
+                                                          snapshot.data[1]['$userLoggedInIndex']['email'],
+                                                          DateTime.now().day,
+                                                          DateTime.now().month,
+                                                          DateTime.now().year,
+                                                        );
+
+                                                        await databaseService.addUserMembership(
+                                                          userLoggedInIndex,
+                                                          snapshot.data[1]['$userLoggedInIndex']['membership-amount']+1,
+                                                          snapshot.data[0]['$currentShopIndex']['memberships']['$currentMembershipIndex']['name'],
+                                                          currentShop,
+                                                          DateTime.now().day,
+                                                          DateTime.now().month,
+                                                          DateTime.now().year,
+                                                        );
+
+                                                        int clientIndex = 0;
+                                                        bool clientFound = false;
+                                                        while(clientIndex <= snapshot.data[0]['$currentShopIndex']['client-amount']){
+
+                                                          if(snapshot.data[0]['$currentShopIndex']['clients']['$clientIndex']['email'] == snapshot.data[1]['$userLoggedInIndex']['email']){
+                                                            clientFound = true;
+                                                            break;
+                                                          }
+
+                                                          clientIndex++;
+                                                        }
+
+                                                        print("5");
+
+                                                        if(!clientFound){
+                                                          await databaseService.addClient(
+                                                            currentCategory,
+                                                            currentShopIndex,
+                                                            snapshot.data[0]['$currentShopIndex']['client-amount']+1,
+                                                            snapshot.data[1]['$userLoggedInIndex']['full-name'],
+                                                            snapshot.data[1]['$userLoggedInIndex']['email'],
+                                                          );
+                                                        }
+                                                        Navigator.pushNamed(context, '/booked');
+
+                                                      }
 
 
 
-                                            },
-                                            child: Text("Purchase", style: TextStyle(
-                                              color: Colors.white,
-                                            ),),
-                                          ),
+                                                    },
+                                                    child: Text("Purchase", style: TextStyle(
+                                                      color: Colors.white,
+                                                    ),),
+                                                  ),
+                                                );
+                                              }
+                                            }
+                                            return const CircularProgressIndicator();
+                                          },
+
                                         ),
                                       ),
                                     ],

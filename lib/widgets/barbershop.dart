@@ -1,6 +1,7 @@
 import 'package:booking_app/constants.dart';
 import 'package:booking_app/models/barbershop.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 
 
 class shopCard extends StatefulWidget {
@@ -50,6 +51,7 @@ class _shopCardState extends State<shopCard> {
                 },
                 child: Container(
                   width: double.infinity,
+                  //margin: EdgeInsets.all(10),
                   height: 100.0,
                   child:ClipRRect(
                     borderRadius: BorderRadius.circular(10),

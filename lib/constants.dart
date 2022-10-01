@@ -192,3 +192,4 @@ bool bookingClicked = false;
 
 bool viewedNotification = false;
 bool onSettings = false;
+bool onMembership = false;

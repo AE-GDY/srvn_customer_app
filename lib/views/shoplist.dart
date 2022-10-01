@@ -341,8 +341,8 @@ class _shopListState extends State<shopList> {
                                 },
                                 child: Container(
                                   width: MediaQuery.of(context).size.width,
-                                  height: 150,
-
+                                  height: MediaQuery.of(context).size.height / 4,
+                                  padding: EdgeInsets.all(0),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(10),
                                     child: Image.network(
@@ -403,6 +403,7 @@ class _shopListState extends State<shopList> {
                               ),
 
 
+                              SizedBox(height: 20,),
 
 
 

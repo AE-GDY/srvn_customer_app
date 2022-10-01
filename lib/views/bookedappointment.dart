@@ -52,7 +52,11 @@ class _SuccessfulBookingState extends State<SuccessfulBooking> {
 
               SizedBox(height: MediaQuery.of(context).size.height/5,),
 
-              Text("Appointment Confirmed", style: TextStyle(
+              typeOfItemSelected != 'Memberships'?Text("Appointment Confirmed!", style: TextStyle(
+                fontSize: 30,
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),):Text("Membership Purchased!", style: TextStyle(
                 fontSize: 30,
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
@@ -64,12 +68,18 @@ class _SuccessfulBookingState extends State<SuccessfulBooking> {
 
               SizedBox(height: 40,),
 
-              Text("Service",
+              typeOfItemSelected != 'Memberships'?Text("Service",
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),):Text("Membership",
                 style: TextStyle(
                   fontSize: 20,
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                 ),),
+
               SizedBox(height: 5,),
               Text("$serviceBooked",
                 style: TextStyle(
@@ -80,38 +90,40 @@ class _SuccessfulBookingState extends State<SuccessfulBooking> {
 
               SizedBox(height: 10,),
 
-              Text("Date",
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),),
-              SizedBox(height: 5,),
-              Text("${onCalender?globalDay:DateTime.now().day} ${onCalender?DateFormat.LLLL().format(timePicked):DateFormat.LLLL().format(DateTime.now())} ${onCalender?globalYear:DateTime.now().year}",
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.bold,
-                ),),
+              typeOfItemSelected != 'Memberships'?Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text("Date",
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),),
+                  SizedBox(height: 5,),
+                  Text("${onCalender?globalDay:DateTime.now().day} ${onCalender?DateFormat.LLLL().format(timePicked):DateFormat.LLLL().format(DateTime.now())} ${onCalender?globalYear:DateTime.now().year}",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.bold,
+                    ),),
 
-              SizedBox(height: 10,),
+                  SizedBox(height: 10,),
 
-              Text("Time",
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),),
+                  Text("Time",
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),),
 
-              Text("$globalTime",
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.bold,
-                ),),
-
-
-
+                  Text("$globalTime",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.bold,
+                    ),),
+                ],
+              ):Container(),
 
 
               Expanded(child: Container()),

@@ -414,7 +414,7 @@ class _CurrentShopState extends State<CurrentShop> {
                         int discountedIndex = 0;
                         while(discountedIndex < discountedServices.length){
 
-                          if(discountedServices[membershipIdx] == snapshot.data![0]['$currentShopIndex']['services']['$index']['service-name']){
+                          if(discountedServices[discountedIndex] == snapshot.data![0]['$currentShopIndex']['services']['$index']['service-name']){
                             isDiscounted = true;
                             break;
                           }
@@ -575,66 +575,45 @@ class _CurrentShopState extends State<CurrentShop> {
                 else if(snapshot.hasData){
 
                   bool userIsMember = false;
+                  String userMembershipName = "";
                   int membershipIndex = 0;
 
 
-                  while(membershipIndex <= snapshot.data[1]['$userLoggedInIndex']['membership-amount']){
+                  if(loggedIn){
+                    while(membershipIndex <= snapshot.data[1]['$userLoggedInIndex']['membership-amount']){
 
-                    if(snapshot.data[1]['$userLoggedInIndex']['memberships']['$membershipIndex']['membership-shop'] == currentShop){
-                      userIsMember = true;
-                      break;
+                      if(snapshot.data[1]['$userLoggedInIndex']['memberships']['$membershipIndex']['membership-shop'] == currentShop){
+                        userIsMember = true;
+                        userMembershipName = snapshot.data[1]['$userLoggedInIndex']['memberships']['$membershipIndex']['membership-name'];
+                        break;
+                      }
+
+                      membershipIndex++;
                     }
-
-                    membershipIndex++;
                   }
 
+                  return Container(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: snapshot.data![0]['$currentShopIndex']['memberships-amount']+1,
+                      scrollDirection: Axis.vertical,
+                      physics: ScrollPhysics(),
+                      itemBuilder: (context, index){
 
-                  if(userIsMember){
-                    // THIS PART NEEDS TO CHANGE
+                        return MembershipTile(
+                            snapshot.data![0]['$currentShopIndex']['memberships']['$index']['name'],
+                            snapshot.data![0]['$currentShopIndex']['memberships']['$index']['price'],
+                            snapshot.data![0]['$currentShopIndex']['memberships']['$index']['duration'],
+                            snapshot.data![0]['$currentShopIndex']['memberships']['$index']['selected-services'],
+                            snapshot.data![0]['$currentShopIndex']['services']['$index']['selected-discounted-services'],
+                            index,
+                            userIsMember,
+                            userMembershipName,
 
-                    return Container(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: snapshot.data![0]['$currentShopIndex']['memberships-amount']+1,
-                        scrollDirection: Axis.vertical,
-                        physics: ScrollPhysics(),
-                        itemBuilder: (context, index){
-
-                          return MembershipTile(
-                              snapshot.data![0]['$currentShopIndex']['memberships']['$index']['name'],
-                              snapshot.data![0]['$currentShopIndex']['memberships']['$index']['price'],
-                              snapshot.data![0]['$currentShopIndex']['memberships']['$index']['duration'],
-                              snapshot.data![0]['$currentShopIndex']['memberships']['$index']['selected-services'],
-                              snapshot.data![0]['$currentShopIndex']['services']['$index']['selected-discounted-services'],
-                              index
-                          );
-                        },
-                      ),
-                    );
-                  }
-                  else{
-                    return Container(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: snapshot.data![0]['$currentShopIndex']['memberships-amount']+1,
-                        scrollDirection: Axis.vertical,
-                        physics: ScrollPhysics(),
-                        itemBuilder: (context, index){
-
-                          return MembershipTile(
-                              snapshot.data![0]['$currentShopIndex']['memberships']['$index']['name'],
-                              snapshot.data![0]['$currentShopIndex']['memberships']['$index']['price'],
-                              snapshot.data![0]['$currentShopIndex']['memberships']['$index']['duration'],
-                              snapshot.data![0]['$currentShopIndex']['memberships']['$index']['selected-services'],
-                              snapshot.data![0]['$currentShopIndex']['services']['$index']['selected-discounted-services'],
-                              index
-                          );
-                        },
-                      ),
-                    );
-                  }
-
-
+                        );
+                      },
+                    ),
+                  );
                 }
               }
               return (const Center(
@@ -1031,6 +1010,8 @@ class ServiceTile extends StatelessWidget {
                 color: Colors.red,
               ),):Container(),
 
+              //
+
             ],
           ),
 
@@ -1043,7 +1024,7 @@ class ServiceTile extends StatelessWidget {
               Text(
                 '${servicePrice} EGP',
                 style: TextStyle(
-                  decoration: (isPromotion || isInMembership)?TextDecoration.lineThrough:TextDecoration.none,
+                  decoration: (isPromotion || isInMembership || isDiscounted)?TextDecoration.lineThrough:TextDecoration.none,
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
@@ -1061,11 +1042,12 @@ class ServiceTile extends StatelessWidget {
                   fontSize: 15,
                   color: Colors.red,
                 ),
-              ):isDiscounted?Text('${servicePrice - (servicePrice*discounts[discountedIndex])}',style: TextStyle(
+              ):isDiscounted?Text('${(int.parse(servicePrice) - (int.parse(servicePrice)*(discounts[discountedIndex] / 100))).round()} EGP',style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 15,
                 color: Colors.deepOrange,
               ),):Container(),
+              
 
             ],
           ),
@@ -1080,8 +1062,11 @@ class ServiceTile extends StatelessWidget {
               if(isInMembership){
                 globalServicePrice = '0';
               }
+              else if(isPromotion){
+                globalServicePrice = serviceDiscountedPrice;
+              }
               else if(isDiscounted){
-                globalServicePrice = '${servicePrice - (servicePrice*discounts[discountedIndex])}';
+                globalServicePrice = '${(int.parse(servicePrice) - (int.parse(servicePrice)*(discounts[discountedIndex] / 100))).round()}';
               }
               else{
                 globalServicePrice = servicePrice;
@@ -1120,11 +1105,13 @@ class ServiceTile extends StatelessWidget {
 
 class MembershipTile extends StatelessWidget {
   final name;
+  final userIsMember;
   final price;
   final duration;
   final services;
   final discountedServices;
   final membershipIndex;
+  final String userMembershipName;
 
   MembershipTile(
       this.name,
@@ -1133,6 +1120,8 @@ class MembershipTile extends StatelessWidget {
       this.services,
       this.discountedServices,
       this.membershipIndex,
+      this.userIsMember,
+      this.userMembershipName,
       );
 
   @override
@@ -1194,17 +1183,33 @@ class MembershipTile extends StatelessWidget {
             onPressed: () {
 
 
-              typeOfItemSelected = tabSelected;
-              currentMembershipIndex = membershipIndex;
+              if(!loggedIn){
+                onMembership = true;
+                Navigator.pushNamed(context, '/login');
+              }
+              else if(!userIsMember){
+                typeOfItemSelected = tabSelected;
+                serviceBooked = name;
+                globalServicePrice = price;
+                currentMembershipIndex = membershipIndex;
 
-              Navigator.pushNamed(context, '/bookingscreen');
+                Navigator.pushNamed(context, '/bookingscreen');
+              }
+
+
             },
-            color: Colors.deepPurple,
+            color: (!userIsMember)?Colors.deepPurple:
+            (userIsMember && name == userMembershipName)?Colors.green:
+            (userIsMember && name != userMembershipName)?Colors.orange:
+            Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
-              'Purchase',
+              (!userIsMember)?'Purchase':
+              (userIsMember && name == userMembershipName)?'Active':
+              (userIsMember && name != userMembershipName)?'Unusable':
+              '',
               style: TextStyle(color: Colors.white),
             ),
           ),

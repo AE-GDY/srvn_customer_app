@@ -221,6 +221,7 @@ class DatabaseService{
         'membership-amount': -1,
         'memberships': {},
         'notifications': {},
+        'appointments': {},
         'full-name': name,
         'email': email,
         'password': password,
