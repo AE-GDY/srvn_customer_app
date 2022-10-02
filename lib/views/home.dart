@@ -303,7 +303,7 @@ class _HomeState extends State<Home> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       FutureBuilder(
-                        future: Future.wait([barbershopData(),hairsalonData(),spaData(),gymData()]),
+                        future: Future.wait([hairsalonData(),barbershopData(),spaData(),gymData()]),
                         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                           if(snapshot.connectionState == ConnectionState.done){
                             if(snapshot.hasError){

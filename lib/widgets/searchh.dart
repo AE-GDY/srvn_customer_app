@@ -84,7 +84,7 @@ class search_service extends SearchDelegate<String> {
                   print(currentShopIndex);
 
                  // query = searchItems[index].shopName;
-                  close(context,query);
+                  //close(context,query);
                   Navigator.popAndPushNamed(context, '/currentshop');
                 } ,
               )

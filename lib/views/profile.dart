@@ -9,7 +9,7 @@ var mainSettings = [
   "Reviews",
   "Payments",
   "Feedback and Support",
-  "About Servnn",
+  "About Srvn",
   "Log in",
 ];
 

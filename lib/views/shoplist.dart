@@ -1,4 +1,5 @@
 import 'package:booking_app/models/barbershop.dart';
+import 'package:booking_app/models/category.dart';
 import 'package:booking_app/models/saloonshop.dart';
 import 'package:booking_app/models/spashop.dart';
 import 'package:booking_app/services/database.dart';
@@ -27,14 +28,35 @@ class _shopListState extends State<shopList> {
     doc("signed-up").get()).data();
   }
 
+
+  Future<Map<String, dynamic>?> barbershopData() async {
+    return (await FirebaseFirestore.instance.collection('shops').
+    doc('Barbershop').get()).data();
+  }
+
+  Future<Map<String, dynamic>?> hairsalonData() async {
+    return (await FirebaseFirestore.instance.collection('shops').
+    doc('Hair Salon').get()).data();
+  }
+
+  Future<Map<String, dynamic>?> spaData() async {
+    return (await FirebaseFirestore.instance.collection('shops').
+    doc('Spa').get()).data();
+  }
+
+  Future<Map<String, dynamic>?> gymData() async {
+    return (await FirebaseFirestore.instance.collection('shops').
+    doc('Gym').get()).data();
+  }
+
   double calculateShopRating(AsyncSnapshot<dynamic> snapshot,int shopIndex, int currentRating){
 
     print('1');
 
     num totalRatings = 0;
     int reviewIndex = 0;
-    while(reviewIndex <= snapshot.data['$currentShopIndex']['reviews-amount']){
-      totalRatings += snapshot.data['$currentShopIndex']['reviews']['$reviewIndex']['rating'];
+    while(reviewIndex <= snapshot.data['$shopIndex']['reviews-amount']){
+      totalRatings += snapshot.data['$shopIndex']['reviews']['$reviewIndex']['rating'];
       reviewIndex++;
     }
 
@@ -145,7 +167,7 @@ class _shopListState extends State<shopList> {
             ),
             actions: [
               FutureBuilder(
-                future: categoryData(),
+                future: Future.wait([hairsalonData(),barbershopData(),spaData(),gymData()]),
                 builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                   if(snapshot.connectionState == ConnectionState.done){
                     if(snapshot.hasError){
@@ -175,28 +197,39 @@ class _shopListState extends State<shopList> {
                                 starIndex++;
                               }
 
+                              bool foundCategory = false;
+                              int categoryIndex = 0;
+                              while(categoryIndex < categoryList.length){
 
-                              int shopIndex = 0;
-                              while(shopIndex <= snapshot.data['total-shop-amount']){
+                                int shopIndex = 0;
+                                while(shopIndex <= snapshot.data[categoryList[categoryIndex].title]['total-shop-amount']){
 
-                                if(sender == snapshot.data['$shopIndex']['shop-name']){
+                                  if(sender == snapshot.data[categoryList[categoryIndex].title]['$shopIndex']['shop-name']){
 
-                                  double newShopRating = calculateShopRating(snapshot,shopIndex, currentRating);
+                                    double newShopRating = calculateShopRating(snapshot,shopIndex, currentRating);
 
-                                  await databaseService.addReview(
-                                      currentCategory,
-                                      shopIndex,
-                                      snapshot.data['$shopIndex']['reviews-amount']+1,
-                                      reviewController.text,
-                                      currentRating,
-                                      userName,
-                                      newShopRating
-                                  );
+                                    foundCategory = true;
 
+                                    await databaseService.addReview(
+                                        currentCategory,
+                                        shopIndex,
+                                        snapshot.data[categoryList[categoryIndex].title]['$shopIndex']['reviews-amount']+1,
+                                        reviewController.text,
+                                        currentRating,
+                                        userName,
+                                        newShopRating
+                                    );
+
+                                    break;
+                                  }
+                                  shopIndex++;
+                                }
+
+                                if(foundCategory){
                                   break;
                                 }
 
-                                shopIndex++;
+                                categoryIndex++;
                               }
 
                               viewedNotification = true;
@@ -243,7 +276,7 @@ class _shopListState extends State<shopList> {
                   icon: Icon(Icons.arrow_back),
                   onPressed: (){
 
-                    Navigator.of(context).pop();
+                    Navigator.popAndPushNamed(context, '/');
 
                     if(loggedIn) {
 

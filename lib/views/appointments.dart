@@ -1,5 +1,6 @@
 import 'package:booking_app/widgets/bottomnavigator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:booking_app/constants.dart';
 
@@ -50,107 +51,113 @@ class _AppointmentListState extends State<AppointmentList> {
                           return Container();
                         }
                         else{
-                          return Padding(
-                            padding: EdgeInsets.all(20),
-                            child: Stack(
-                              children: [
-                                Container(
-                                  height: 300,
-                                  width: 400,
-                                  decoration: BoxDecoration(
-                                      color: Colors.greenAccent,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black54,
-                                          blurRadius: 12,
-                                          offset: Offset(0,6),
+                          return Container(
+                            margin: EdgeInsets.all(10),
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              elevation: 5.0,
+                              child: Container(
+                                margin: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(22),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(height: 10,),
+                                    Row(
+                                      children: [
+                                        Container(
+                                          child: Text("${snapshot.data['$userLoggedInIndex']['appointments']['$index']['place-booked']}",
+                                            style: TextStyle(
+                                              fontSize: 25,
+                                              fontWeight: FontWeight.bold,
+                                            ),),
                                         ),
-                                      ]
-                                  ),
-                                  child: Card(
-                                    elevation: 5.0,
-                                    child: Container(
-                                      margin: EdgeInsets.only(right: 10),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(22),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  left: 20,
-                                  top: 30,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        child: Text("${snapshot.data['$userLoggedInIndex']['appointments']['$index']['place-booked']}",
-                                          style: TextStyle(
-                                            fontSize: 25,
-                                            fontWeight: FontWeight.bold,
-                                          ),),
-                                      ),
-                                      SizedBox(height: 20,),
-                                      Container(
-                                        child: Text("Service",
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                          ),),
-                                      ),
-                                      SizedBox(height: 5,),
-                                      Container(
-                                        child: Text("${snapshot.data['$userLoggedInIndex']['appointments']['$index']['service-booked']}",
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                          ),),
-                                      ),
-                                      SizedBox(height: 10,),
-                                      Container(
-                                        child: Text("Date",
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                          ),),
-                                      ),
-                                      SizedBox(height: 5,),
-                                      Container(
-                                        child: Text("${snapshot.data['$userLoggedInIndex']['appointments']['$index']['date-booked']}",
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                          ),),
-                                      ),
-                                      SizedBox(height: 10,),
-                                      Container(
-                                        child: Text("Duration",
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                          ),),
-                                      ),
-                                      SizedBox(height: 5,),
-                                      Container(
-                                        child: Text("${snapshot.data['$userLoggedInIndex']['appointments']['$index']['duration-booked']}",style: TextStyle(
-                                          fontSize: 20,
-                                        ),),
-                                      ),
-                                      SizedBox(height: 10,),
-                                    ],
-                                  ),
-                                ),
 
-                                Positioned(
-                                  right: 30,
-                                  top: 240,
-                                  child: Container(
-                                    child: Text("${snapshot.data['$userLoggedInIndex']['appointments']['$index']['service-price']} EGP", style: TextStyle(
-                                      fontSize: 30,
-                                      fontWeight: FontWeight.bold,
-                                    ),),
-                                  ),
+                                        /*
+                                        FutureBuilder(
+                                          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                                            if(snapshot.connectionState == ConnectionState.done){
+                                              if(snapshot.hasError){
+                                                return const Text("Please wait");
+                                              }
+                                              else if(snapshot.hasData){
+                                                return Image.network(
+                                                  snapshot.data['$currentShopIndex']['images']['${-1}'],
+                                                  width: MediaQuery.of(context).size.width,
+                                                  alignment: Alignment.center,
+                                                  fit: BoxFit.fitWidth,
+                                                );
+                                              }
+                                            }
+                                            return const CircularProgressIndicator();
+                                          },
+
+                                        ),
+                                        */
+
+                                      ],
+                                    ),
+                                    SizedBox(height: 20,),
+                                    Container(
+                                      child: Text("Service",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),),
+                                    ),
+                                    SizedBox(height: 5,),
+                                    Container(
+                                      child: Text("${snapshot.data['$userLoggedInIndex']['appointments']['$index']['service-booked']}",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                        ),),
+                                    ),
+                                    SizedBox(height: 10,),
+                                    Container(
+                                      child: Text("Date",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),),
+                                    ),
+                                    SizedBox(height: 5,),
+                                    Container(
+                                      child: Text("${snapshot.data['$userLoggedInIndex']['appointments']['$index']['date-booked']}",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                        ),),
+                                    ),
+                                    SizedBox(height: 10,),
+                                    Container(
+                                      child: Text("Duration",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),),
+                                    ),
+                                    SizedBox(height: 5,),
+                                    Container(
+                                      child: Text("${snapshot.data['$userLoggedInIndex']['appointments']['$index']['duration-booked']}",style: TextStyle(
+                                        fontSize: 20,
+                                      ),),
+                                    ),
+                                    SizedBox(height: 10,),
+
+                                    Container(
+                                      alignment: Alignment.bottomRight,
+                                      child: Text("${snapshot.data['$userLoggedInIndex']['appointments']['$index']['service-price']} EGP", style: TextStyle(
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.bold,
+                                      ),),
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
                           );
                         }
