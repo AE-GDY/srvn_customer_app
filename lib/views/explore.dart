@@ -21,7 +21,7 @@ class _ExploreState extends State<Explore> {
         centerTitle: true,
         actions: <Widget>[
           IconButton(icon: Icon(Icons.search), onPressed:(){
-            showSearch(context: context, delegate: DataSearch(condition: false));
+            showSearch(context: context, delegate: DataSearch(condition: false,services: []));
           }),
         ],
       ),

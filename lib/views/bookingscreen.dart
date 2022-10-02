@@ -847,6 +847,8 @@ class _BarberTimeState extends State<BarberTime> {
                                                           serviceDuration,
                                                           globalServiceLinked?"none":snapshot.data![0]['$currentShopIndex']['staff-members']['$currentEmployeeIndex']['member-name'],
                                                           globalServicePrice,
+                                                          globalStartTime,
+                                                          globalEndTime,
                                                         );
 
                                                         print("4");
@@ -1992,7 +1994,7 @@ class _BarberTimeState extends State<BarberTime> {
     // THIS STRING WILL STORE THE NEW MINUTE USING THE MINUTE GAP
     int endMinuteInt = generateEndMinute(startMinute, minuteDuration);
 
-    if (endMinuteInt > 60 || endMinuteInt == 0 || endMinuteInt == 60) {
+    if (endMinuteInt > 60 || endMinuteInt == 60) {
       endHourInt++;
 
       if (endHourInt > 12) {

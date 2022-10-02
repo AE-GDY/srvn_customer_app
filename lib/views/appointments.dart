@@ -46,8 +46,45 @@ class _AppointmentListState extends State<AppointmentList> {
                 child: ListView.builder(
                     itemCount: snapshot.data['$userLoggedInIndex']['appointment-amount']+1,
                     itemBuilder: (context, index){
+
+
+
                       if(loggedIn){
+
+
+                        int currentHour = DateTime.now().hour;
+                        int currentMinute = DateTime.now().minute;
+
+                        String currentTime = "";
+                        String end = "";
+                        String minute = "";
+
+                        if(currentHour >= 12){
+                          if(currentHour != 12){
+                            currentHour -= 12;
+                          }
+                          end = 'PM';
+                        }
+                        else{
+                          end = 'AM';
+                        }
+
+                        if(currentMinute == 0){
+                          minute = "00";
+                        }
+                        else{
+                          minute = '$currentMinute';
+                        }
+
+                        currentTime = '$currentHour:$currentMinute $end';
+
+                        bool currentTimeGreaterThanAppointmentTime = isGreater(currentTime,snapshot.data['$userLoggedInIndex']['appointments']['$index']['end-time']);
+
+
                         if(snapshot.data['$userLoggedInIndex']['appointments']['$index']['appointment-status'] == false){
+                          return Container();
+                        }
+                        else if(currentTimeGreaterThanAppointmentTime){
                           return Container();
                         }
                         else{
@@ -175,4 +212,143 @@ class _AppointmentListState extends State<AppointmentList> {
       ),
     );
   }
+
+
+  bool isGreater(String firstTime, String secondTime){
+
+    String firstTimeEnd = getAMorPM(firstTime);
+    String secondTimeEnd  = getAMorPM(secondTime);
+
+    String firstTimeHour = getHour(firstTime);
+    String secondTimeHour = getHour(secondTime);
+
+    int firstTimeHourInt = int.parse(firstTimeHour);
+    int secondTimeHourInt = int.parse(secondTimeHour);
+
+    String firstTimeMinute = getMinute(firstTime);
+    String endTimeMinute = getMinute(secondTime);
+
+    int firstTimeMinuteInt = int.parse(firstTimeMinute);
+    int secondTimeMinuteInt = int.parse(endTimeMinute);
+
+    if(firstTimeEnd == 'AM' && firstTimeHourInt == 12){
+      firstTimeHourInt = 0;
+    }
+    if(secondTimeEnd == 'AM' && secondTimeHourInt == 12){
+      secondTimeHourInt = 0;
+    }
+
+    if(firstTimeEnd == 'PM'){
+      if(firstTimeHourInt != 12){
+        firstTimeHourInt += 12;
+      }
+    }
+    if(secondTimeEnd == 'PM'){
+      if(secondTimeEnd != 12){
+        secondTimeHourInt += 12;
+      }
+    }
+
+    if(firstTimeHourInt == secondTimeHourInt){
+      if(firstTimeMinuteInt >= secondTimeMinuteInt){
+        print('1');
+        return true;
+      }
+    }
+    else if(firstTimeHourInt > secondTimeHourInt){
+      print('2');
+      return true;
+    }
+    return false;
+  }
+
+  String getAMorPM(String time){
+
+    // WHERE THE MINUTE WILL BE STORES
+    String output = "";
+
+    // CHARACTER INDEX IN TIME STRING (EXAMPLE "10:00 PM" IS TIME STRING)
+    int charIndex = 0;
+
+    // CHECKS IF "charIndex" IS AT THE FIRST NUMBER OF THE MINUTE
+    bool reachedLetter = false;
+
+    while(charIndex < time.length){
+
+      if(time[charIndex] == 'A' || time[charIndex] == 'P'){
+        reachedLetter = true;
+      }
+
+      if(reachedLetter){
+        output += time[charIndex];
+      }
+
+      charIndex++;
+    }
+
+    return output;
+  }
+
+  // GETS MINUTE FROM INPUT STRING
+  String getMinute(String time){
+
+    // WHERE THE MINUTE WILL BE STORES
+    String minute = "";
+
+    // CHARACTER INDEX IN TIME STRING (EXAMPLE "10:00 PM" IS TIME STRING)
+    int charIndex = 0;
+
+    // CHECKS IF "charIndex" IS AT THE FIRST NUMBER OF THE MINUTE
+    bool reachedMinute = false;
+
+    while(charIndex < time.length){
+
+
+      // IF "reachedMinute" THEN ADD THE CURRENT CHARACTER TO THE MINUTE STRING
+      if(reachedMinute){
+        minute += time[charIndex];
+      }
+
+      // IF CURRENT CHARACTER IS ':', THIS MEANS NEXT CHARACTER IS THE FIRST NUMBER OF THE MINUTE
+      if(time[charIndex] == ':'){
+        reachedMinute = true;
+      }
+
+      // IF CURRENT CHARACTER IS " " (A SPACE), THEN THE LAST
+      // NUMBER OF THE MINUTE IS DONE SO RETURN THE MINUTE
+      else if(time[charIndex] == " "){
+        return minute;
+      }
+
+      charIndex++;
+    }
+
+    return minute;
+  }
+
+
+  // GETS HOUR FROM TIME STRING
+  String getHour(String time){
+
+    // WHERE THE HOUR WILL BE STORED
+    String hour = "";
+
+    // CHARACTER INDEX IN TIME STRING (EXAMPLE "10:00 PM" IS TIME STRING)
+    int charIndex = 0;
+
+    while(charIndex < time.length){
+
+      if(time[charIndex] == ':'){
+        return hour;
+      }
+      else{
+        hour += time[charIndex];
+      }
+
+      charIndex++;
+    }
+
+    return hour;
+  }
+
 }

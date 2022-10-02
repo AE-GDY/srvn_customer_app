@@ -55,41 +55,80 @@ class search_service extends SearchDelegate<String> {
   @override
   Widget buildSuggestions(BuildContext context) {
 
-
-    final List<Shop> searchItems =shops.where(
+    //query.isEmpty ?recommendedPlaces: (searchItems = (STATEMENT))
+    final List<Shop> searchItems = shops.where(
           (itemName) => itemName.shopName.toLowerCase().contains(
         query.toLowerCase(),
       ),
     ).toList();
-    return ListView.builder(
-        itemCount: searchItems.length,
-        itemBuilder: (context,index){
-          return Card(
-              elevation: 1.0,
-              child: ListTile(
-                title: Text(searchItems[index].shopName,style: TextStyle(fontSize: 20)),
-                subtitle: Text(searchItems[index].shopAddress,style: TextStyle(fontSize: 16)),
-                trailing: Text('${(searchItems[index].shopRating)}', style: TextStyle(
+    return Column(
+      children: [
 
-                ),),
-                onTap:(){
+        query.isEmpty?
+            Container(
+              alignment: Alignment.centerLeft,
+              margin: EdgeInsets.all(10),
+              child: Text('Recommended Places',style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),),
+            ):Container(),
+
+        SizedBox(height: 5,),
+        Expanded(
+          child: ListView.builder(
+          itemCount: searchItems.length,
+              itemBuilder: (context,index){
+                return Card(
+                    elevation: 1.0,
+                    child: ListTile(
+                      title: Text(searchItems[index].shopName,style: TextStyle(fontSize: 20)),
+                      subtitle: Text('${searchItems[index].shopCategory}, ${searchItems[index].shopAddress}',style: TextStyle(fontSize: 16)),
+                      trailing: Container(
+                        width: MediaQuery.of(context).size.width/6,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: 10,),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Icon(Icons.star, color: Color(0xffFF8573),),
+                                Text('${(searchItems[index].shopRating)}', style: TextStyle(
+                                  color: Color(0xffFF8573),
+                                ),),
+                              ],
+                            ),
+                            SizedBox(height: 5,),
+                            Text('${(searchItems[index].shopReviewAmount)} reviews', style: TextStyle(
+                              color: Colors.black,
+                            ),),
+                          ],
+                        ),
+                      ),
+                      onTap:(){
 
 
-                  currentCategory = searchItems[index].shopCategory;
-                  currentShopIndex = searchItems[index].shopIndex;
-                  currentShop = searchItems[index].shopName;
-                  currentAddress = searchItems[index].shopAddress;
+                        currentCategory = searchItems[index].shopCategory;
+                        currentShopIndex = searchItems[index].shopIndex;
+                        currentShop = searchItems[index].shopName;
+                        currentAddress = searchItems[index].shopAddress;
 
-                  print(currentCategory);
-                  print(currentShopIndex);
+                        print(currentCategory);
+                        print(currentShopIndex);
 
-                 // query = searchItems[index].shopName;
-                  //close(context,query);
-                  Navigator.popAndPushNamed(context, '/currentshop');
-                } ,
-              )
-          );
-        }
+                        // query = searchItems[index].shopName;
+                        //close(context,query);
+                        Navigator.popAndPushNamed(context, '/currentshop');
+                      } ,
+                    )
+                );
+              }
+          ),
+        ),
+
+      ],
     );
   }
 }

@@ -1,11 +1,14 @@
 import 'package:booking_app/models/barbershop.dart';
 import 'package:booking_app/models/category.dart';
 import 'package:booking_app/models/saloonshop.dart';
+import 'package:booking_app/models/shop_model.dart';
 import 'package:booking_app/models/spashop.dart';
 import 'package:booking_app/services/database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:booking_app/constants.dart';
+
+import '../widgets/searchh.dart';
 
 class shopList extends StatefulWidget {
   const shopList({Key? key}) : super(key: key);
@@ -17,6 +20,8 @@ class shopList extends StatefulWidget {
 class _shopListState extends State<shopList> {
 
   DatabaseService databaseService = DatabaseService();
+
+  List<Shop> allShops = [];
 
   Future<Map<String, dynamic>?> categoryData() async {
     return (await FirebaseFirestore.instance.collection('shops').
@@ -335,11 +340,34 @@ class _shopListState extends State<shopList> {
                             child: TextField(
                               readOnly: true,
                               textAlignVertical: TextAlignVertical.center,
-                              onTap: (){
+                              onTap: () async {
 
                                 // SEARCH FUNCTIONALITY NEEDED
 
+                                allShops = [];
 
+                                int shopIndex = 0;
+                                while(shopIndex <= snapshot.data['total-shop-amount']){
+
+                                  dynamic currentRating = snapshot.data['$shopIndex']['reviews-rating'];
+
+                                  dynamic ratingRounded = currentRating.toStringAsFixed(1);
+
+                                  Shop currentShop = Shop(
+                                      shopName: snapshot.data['$shopIndex']['shop-name'],
+                                      shopCategory: currentCategory,
+                                      shopAddress: snapshot.data['$shopIndex']['shop-address'],
+                                      shopReviewAmount: snapshot.data['$shopIndex']['reviews-amount']+1,
+                                      shopRating: ratingRounded,
+                                      shopIndex: shopIndex
+                                  );
+
+                                  allShops.add(currentShop);
+
+                                  shopIndex++;
+                                }
+
+                                final finalresult = await showSearch(context: context, delegate: search_service(allServices: [], shops: allShops));
 
                               },
                               decoration: InputDecoration(

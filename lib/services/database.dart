@@ -266,6 +266,8 @@ class DatabaseService{
       String durationBooked,
       String memberName,
       String servicePrice,
+      String startTime,
+      String endTime,
       ) async {
     return await users.doc("signed-up").set({
       '$userIndex' : {
@@ -279,6 +281,8 @@ class DatabaseService{
             'index': appointmentIndex,
             'member-name': memberName,
             'service-price': servicePrice,
+            'start-time': startTime,
+            'end-time': endTime,
           },
         },
         'appointment-amount':appointmentIndex,

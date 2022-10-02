@@ -1,5 +1,6 @@
 import 'package:booking_app/models/barbershop.dart';
 import 'package:booking_app/models/saloonshop.dart';
+import 'package:booking_app/models/service_model.dart';
 import 'package:booking_app/models/spashop.dart';
 import 'package:booking_app/widgets/search.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,6 +20,8 @@ class CurrentShop extends StatefulWidget {
 String tabSelected = "Services";
 class _CurrentShopState extends State<CurrentShop> {
 
+
+  List<Service> allServices = [];
 
   List<String> shopServices_name = [];
   String selectedplace='';
@@ -246,26 +249,59 @@ class _CurrentShopState extends State<CurrentShop> {
           Row(
             children: [
               SizedBox(width:10),
-              Container(
-                width: (MediaQuery.of(context).size.width / 100) * 90,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: TextField(
-                  readOnly: true,
-                  textAlignVertical: TextAlignVertical.center,
-                  onTap: (){
-                    showSearch(context: context, delegate: DataSearch(condition: true));
-                  },
-                  decoration: InputDecoration(
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    hintText: "Search For Service",
-                    prefixIcon: Icon(Icons.search),
-                  ),
-                ),
+
+              FutureBuilder(
+                future: categoryData(),
+                builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                  if(snapshot.connectionState == ConnectionState.done){
+                    if(snapshot.hasError){
+                      return const Text("There is an error");
+                    }
+                    else if(snapshot.hasData){
+                      return Container(
+                        width: (MediaQuery.of(context).size.width / 100) * 90,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: TextField(
+                          readOnly: true,
+                          textAlignVertical: TextAlignVertical.center,
+                          onTap: () async {
+
+                            allServices = [];
+
+                            int serviceIndex = 0;
+                            while(serviceIndex < snapshot.data['$currentShopIndex']['services-amount']){
+
+                              Service currentService = Service(
+                                  name: snapshot.data['$currentShopIndex']['services']['$serviceIndex']['service-name'],
+                                  price: snapshot.data['$currentShopIndex']['services']['$serviceIndex']['service-price'],
+                                  duration: '${snapshot.data['$currentShopIndex']['services']['$serviceIndex']['service-hours']}${snapshot.data['$currentShopIndex']['services']['$serviceIndex']['service-minutes']}',
+                              );
+
+                              allServices.add(currentService);
+
+                              serviceIndex++;
+                            }
+
+
+                            final finalresult = await showSearch(context: context, delegate: DataSearch(condition: false,services: allServices));
+                          },
+                          decoration: InputDecoration(
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            hintText: "Search For Service",
+                            prefixIcon: Icon(Icons.search),
+                          ),
+                        ),
+                      );
+                    }
+                  }
+                  return const CircularProgressIndicator();
+                },
+
               ),
             ],
           ),
@@ -472,7 +508,7 @@ class _CurrentShopState extends State<CurrentShop> {
                   readOnly: true,
                   textAlignVertical: TextAlignVertical.center,
                   onTap: (){
-                    showSearch(context: context, delegate: DataSearch(condition: true));
+                    //showSearch(context: context, delegate: DataSearch(condition: true));
                   },
                   decoration: InputDecoration(
                     enabledBorder: InputBorder.none,
@@ -550,7 +586,7 @@ class _CurrentShopState extends State<CurrentShop> {
                   readOnly: true,
                   textAlignVertical: TextAlignVertical.center,
                   onTap: (){
-                    showSearch(context: context, delegate: DataSearch(condition: true));
+                    showSearch(context: context, delegate: DataSearch(condition: true,services: []));
                   },
                   decoration: InputDecoration(
                     enabledBorder: InputBorder.none,

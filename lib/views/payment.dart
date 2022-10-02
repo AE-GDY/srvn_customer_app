@@ -246,6 +246,8 @@ class _PaymentState extends State<Payment> {
                                   serviceDuration,
                                   globalServiceLinked?"none":snapshot.data[0]['$currentShopIndex']['staff-members']['$currentEmployeeIndex']['member-name'],
                                   globalServicePrice,
+                                  globalStartTime,
+                                  globalEndTime,
                                 );
 
                                 print("4");
