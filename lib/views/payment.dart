@@ -248,6 +248,10 @@ class _PaymentState extends State<Payment> {
                                   globalServicePrice,
                                   globalStartTime,
                                   globalEndTime,
+                                  startDay,
+                                  startMonth,
+                                  startYear,
+                                  snapshot.data![0]['$currentShopIndex']['images']['${-1}'],
                                 );
 
                                 print("4");

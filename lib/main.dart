@@ -13,6 +13,7 @@ import 'package:booking_app/views/shoplist.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:overlay_support/overlay_support.dart';
 
 
 
@@ -29,27 +30,29 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'Flutter Barbershop',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          textTheme:  GoogleFonts.latoTextTheme(),
-        ),
-        initialRoute: '/',
-        routes: <String, WidgetBuilder>{
-          '/' : (context) => Home(),
-          '/login': (context) => LoginScreen(),
-          '/currentshop' : (context) => CurrentShop(),
-          '/bookingscreen': (context) => BarberTime(),
-          '/appointments': (context) => AppointmentList(),
-          '/shoplist': (context) => shopList(),
-          '/booked' : (context) => SuccessfulBooking(),
-          '/explore': (context) => Explore(),
-          '/profile': (context) => Profile(),
-          '/payment': (context) => Payment(),
-          '/payment-methods': (context) => PaymentMethods(),
-          '/add-card': (context) => AddCreditCard(),
-        }
+    return OverlaySupport.global(
+      child: MaterialApp(
+          title: 'Flutter Barbershop',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            textTheme:  GoogleFonts.latoTextTheme(),
+          ),
+          initialRoute: '/',
+          routes: <String, WidgetBuilder>{
+            '/' : (context) => Home(),
+            '/login': (context) => LoginScreen(),
+            '/currentshop' : (context) => CurrentShop(),
+            '/bookingscreen': (context) => BarberTime(),
+            '/appointments': (context) => AppointmentList(),
+            '/shoplist': (context) => shopList(),
+            '/booked' : (context) => SuccessfulBooking(),
+            '/explore': (context) => Explore(),
+            '/profile': (context) => Profile(),
+            '/payment': (context) => Payment(),
+            '/payment-methods': (context) => PaymentMethods(),
+            '/add-card': (context) => AddCreditCard(),
+          }
+      ),
     );
   }
 }

@@ -21,7 +21,7 @@ String tabSelected = "Services";
 class _CurrentShopState extends State<CurrentShop> {
 
 
-  List<Service> allServices = [];
+  List<Service> allItems = [];
 
   List<String> shopServices_name = [];
   String selectedplace='';
@@ -270,24 +270,45 @@ class _CurrentShopState extends State<CurrentShop> {
                           textAlignVertical: TextAlignVertical.center,
                           onTap: () async {
 
-                            allServices = [];
+                            allItems = [];
 
-                            int serviceIndex = 0;
-                            while(serviceIndex < snapshot.data['$currentShopIndex']['services-amount']){
+                            if(tabSelected == 'Services'){
+                              int serviceIndex = 0;
+                              while(serviceIndex < snapshot.data['$currentShopIndex']['services-amount']){
 
-                              Service currentService = Service(
+                                Service currentService = Service(
+                                  serviceIndex: serviceIndex,
                                   name: snapshot.data['$currentShopIndex']['services']['$serviceIndex']['service-name'],
                                   price: snapshot.data['$currentShopIndex']['services']['$serviceIndex']['service-price'],
                                   duration: '${snapshot.data['$currentShopIndex']['services']['$serviceIndex']['service-hours']}${snapshot.data['$currentShopIndex']['services']['$serviceIndex']['service-minutes']}',
-                              );
+                                );
 
-                              allServices.add(currentService);
+                                allItems.add(currentService);
 
-                              serviceIndex++;
+                                serviceIndex++;
+                              }
+                            }
+                            else{
+                              int membershipIndex = 0;
+                              while(membershipIndex <= snapshot.data['$currentShopIndex']['memberships-amount']){
+
+                                Service currentService = Service(
+                                  serviceIndex: membershipIndex,
+                                  name: snapshot.data['$currentShopIndex']['memberships']['$membershipIndex']['name'],
+                                  price: snapshot.data['$currentShopIndex']['memberships']['$membershipIndex']['price'],
+                                  duration: '${snapshot.data['$currentShopIndex']['memberships']['$membershipIndex']['duration']} month/s',
+                                );
+
+                                allItems.add(currentService);
+
+                                membershipIndex++;
+                              }
                             }
 
 
-                            final finalresult = await showSearch(context: context, delegate: DataSearch(condition: false,services: allServices));
+
+
+                            final finalresult = await showSearch(context: context, delegate: DataSearch(type: tabSelected,services: allItems));
                           },
                           decoration: InputDecoration(
                             enabledBorder: InputBorder.none,
@@ -586,7 +607,7 @@ class _CurrentShopState extends State<CurrentShop> {
                   readOnly: true,
                   textAlignVertical: TextAlignVertical.center,
                   onTap: (){
-                    showSearch(context: context, delegate: DataSearch(condition: true,services: []));
+                    showSearch(context: context, delegate: DataSearch(type:'',services: []));
                   },
                   decoration: InputDecoration(
                     enabledBorder: InputBorder.none,

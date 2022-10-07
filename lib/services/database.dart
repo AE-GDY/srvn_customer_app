@@ -268,6 +268,10 @@ class DatabaseService{
       String servicePrice,
       String startTime,
       String endTime,
+      int startDay,
+      int startMonth,
+      int startYear,
+      String placeLogo,
       ) async {
     return await users.doc("signed-up").set({
       '$userIndex' : {
@@ -283,6 +287,10 @@ class DatabaseService{
             'service-price': servicePrice,
             'start-time': startTime,
             'end-time': endTime,
+            'start-day': startDay,
+            'start-month': startMonth,
+            'start-year': startYear,
+            'place-logo': placeLogo,
           },
         },
         'appointment-amount':appointmentIndex,

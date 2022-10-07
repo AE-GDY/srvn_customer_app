@@ -36,7 +36,7 @@ class _shopCardState extends State<shopCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            flex: 2,
+            //flex: 2,
             child: Container(
               child: TextButton(
                 onPressed: (){

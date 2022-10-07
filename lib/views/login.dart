@@ -265,9 +265,8 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildForgotPasswordBtn() {
     return Container(
       alignment: Alignment.centerRight,
-      child: FlatButton(
+      child: TextButton(
         onPressed: () => print('Forgot Password Button Pressed'),
-        padding: EdgeInsets.only(right: 0.0),
         child: Text(
           'Forgot Password?',
           style: kLabelStyle,
@@ -447,6 +446,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               globalServicePrice,
                               globalStartTime,
                               globalEndTime,
+                              startDay,
+                              startMonth,
+                              startYear,
+                              snapshot.data![0]['$currentShopIndex']['images']['${-1}'],
                             );
 
                             print("4");

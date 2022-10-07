@@ -240,7 +240,7 @@ class _NavigationBarState extends State<NavigationBar2> {
                         }
                       }
                     },
-                    child: BottomNavItem(currentIndex: 0,title: "Home", icon: Icons.home,),
+                    child: BottomNavItem(currentIndex: 0,title: "Home", icon: Icons.home_filled,),
                   );
                 }
               }
@@ -256,7 +256,7 @@ class _NavigationBarState extends State<NavigationBar2> {
               onSettings = false;
               Navigator.pushNamed(context, '/appointments');
             },
-            child: BottomNavItem(currentIndex: 1,title: "Appointments", icon: Icons.calendar_today),
+            child: BottomNavItem(currentIndex: 1,title: "Bookings", icon: Icons.calendar_today),
           ),
           GestureDetector(
             onTap: (){
@@ -285,10 +285,9 @@ class BottomNavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Icon(icon, color: (activeIndex == currentIndex)?Colors.black:Colors.grey,),
-        SizedBox(height: 5,),
+        Icon(icon, color: (activeIndex == currentIndex)?Colors.deepPurple:Colors.deepPurple[100],size: 30,),
         Text("$title", style: TextStyle(
-          color: (activeIndex == currentIndex)?Colors.black:Colors.white,
+          color: (activeIndex == currentIndex)?Colors.deepPurple:Colors.deepPurple[100],
           fontWeight: (activeIndex == currentIndex)? FontWeight.bold:FontWeight.normal
         ),),
       ],

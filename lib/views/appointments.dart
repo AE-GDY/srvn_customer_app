@@ -31,6 +31,7 @@ class _AppointmentListState extends State<AppointmentList> {
         automaticallyImplyLeading: false,
         title: Text("Appointments",style: TextStyle(
           color: Colors.black,
+          fontWeight: FontWeight.bold,
         ),),
         centerTitle: true,
       ),
@@ -78,7 +79,16 @@ class _AppointmentListState extends State<AppointmentList> {
 
                         currentTime = '$currentHour:$currentMinute $end';
 
-                        bool currentTimeGreaterThanAppointmentTime = isGreater(currentTime,snapshot.data['$userLoggedInIndex']['appointments']['$index']['end-time']);
+
+                        bool currentTimeGreaterThanAppointmentTime = false;
+
+                        if(DateTime.now().day >= snapshot.data['$userLoggedInIndex']['appointments']['$index']['start-day']
+                        &&DateTime.now().day >= snapshot.data['$userLoggedInIndex']['appointments']['$index']['start-month']
+                        && DateTime.now().day >= snapshot.data['$userLoggedInIndex']['appointments']['$index']['start-year']){
+                          currentTimeGreaterThanAppointmentTime = isGreater(currentTime,snapshot.data['$userLoggedInIndex']['appointments']['$index']['end-time']);
+                        }
+
+
 
 
                         if(snapshot.data['$userLoggedInIndex']['appointments']['$index']['appointment-status'] == false){
@@ -90,11 +100,15 @@ class _AppointmentListState extends State<AppointmentList> {
                         else{
                           return Container(
                             margin: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey.shade400,width: 2),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
                             child: Card(
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              elevation: 5.0,
+                              elevation: 0,
                               child: Container(
                                 margin: EdgeInsets.all(10),
                                 decoration: BoxDecoration(
@@ -106,6 +120,7 @@ class _AppointmentListState extends State<AppointmentList> {
                                   children: [
                                     SizedBox(height: 10,),
                                     Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Container(
                                           child: Text("${snapshot.data['$userLoggedInIndex']['appointments']['$index']['place-booked']}",
@@ -113,6 +128,18 @@ class _AppointmentListState extends State<AppointmentList> {
                                               fontSize: 25,
                                               fontWeight: FontWeight.bold,
                                             ),),
+                                        ),
+
+
+                                        Container(
+                                          width: 100,
+                                          height: 80,
+                                          child: Image.network(
+                                            snapshot.data['$userLoggedInIndex']['appointments']['$index']['place-logo'],
+                                            alignment: Alignment.center,
+                                            fit: BoxFit.fitWidth,
+
+                                          ),
                                         ),
 
                                         /*
@@ -139,7 +166,6 @@ class _AppointmentListState extends State<AppointmentList> {
 
                                       ],
                                     ),
-                                    SizedBox(height: 20,),
                                     Container(
                                       child: Text("Service",
                                         style: TextStyle(
@@ -178,20 +204,27 @@ class _AppointmentListState extends State<AppointmentList> {
                                         ),),
                                     ),
                                     SizedBox(height: 5,),
-                                    Container(
-                                      child: Text("${snapshot.data['$userLoggedInIndex']['appointments']['$index']['duration-booked']}",style: TextStyle(
-                                        fontSize: 20,
-                                      ),),
-                                    ),
-                                    SizedBox(height: 10,),
 
-                                    Container(
-                                      alignment: Alignment.bottomRight,
-                                      child: Text("${snapshot.data['$userLoggedInIndex']['appointments']['$index']['service-price']} EGP", style: TextStyle(
-                                        fontSize: 30,
-                                        fontWeight: FontWeight.bold,
-                                      ),),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(
+                                          child: Text("${snapshot.data['$userLoggedInIndex']['appointments']['$index']['duration-booked']}",style: TextStyle(
+                                            fontSize: 20,
+                                          ),),
+                                        ),
+
+                                        Container(
+                                          alignment: Alignment.bottomRight,
+                                          child: Text("${snapshot.data['$userLoggedInIndex']['appointments']['$index']['service-price']} EGP", style: TextStyle(
+                                            fontSize: 30,
+                                            fontWeight: FontWeight.bold,
+                                          ),),
+                                        ),
+                                      ],
                                     ),
+
+
                                   ],
                                 ),
                               ),

@@ -10,10 +10,10 @@ import '../constants.dart';
 
 class DataSearch extends SearchDelegate<String>{
 
-  bool condition;
+  String type;
   List<Service> services;
   DataSearch({
-    required this.condition,
+    required this.type,
     required this.services,
   });
 
@@ -75,7 +75,7 @@ class DataSearch extends SearchDelegate<String>{
         Container(
           alignment: Alignment.centerLeft,
           margin: EdgeInsets.all(10),
-          child: Text('Recommended Services',style: TextStyle(
+          child: Text(type == 'Services'?'Recommended Services':'Recommended Memberships',style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
             fontSize: 18,

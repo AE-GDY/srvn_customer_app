@@ -54,6 +54,12 @@ class _shopListState extends State<shopList> {
     doc('Gym').get()).data();
   }
 
+  Future<Map<String, dynamic>?> carData() async {
+    return (await FirebaseFirestore.instance.collection('shops').
+    doc('Car Wash').get()).data();
+  }
+
+
   double calculateShopRating(AsyncSnapshot<dynamic> snapshot,int shopIndex, int currentRating){
 
     print('1');
@@ -172,7 +178,7 @@ class _shopListState extends State<shopList> {
             ),
             actions: [
               FutureBuilder(
-                future: Future.wait([hairsalonData(),barbershopData(),spaData(),gymData()]),
+                future: Future.wait([hairsalonData(),barbershopData(),spaData(),gymData(), carData()]),
                 builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                   if(snapshot.connectionState == ConnectionState.done){
                     if(snapshot.hasError){
@@ -359,6 +365,7 @@ class _shopListState extends State<shopList> {
                                       shopAddress: snapshot.data['$shopIndex']['shop-address'],
                                       shopReviewAmount: snapshot.data['$shopIndex']['reviews-amount']+1,
                                       shopRating: ratingRounded,
+                                      imageUrl: snapshot.data['$shopIndex']['images']['${-1}'],
                                       shopIndex: shopIndex
                                   );
 
@@ -373,10 +380,12 @@ class _shopListState extends State<shopList> {
                               decoration: InputDecoration(
                                 enabledBorder: InputBorder.none,
                                 focusedBorder: InputBorder.none,
-                                hintText: onBarberShop?"Search For Barbershop":
-                                onSaloonShop?"Search For Hairsalon":
-                                onGymShop?"Search For Gym":
-                                "Search For Spa",
+                                hintText: currentCategory == 'Barbershop'?"Search For Barbershop":
+                                currentCategory == 'Hair Salon'?"Search For Hairsalon":
+                                currentCategory == 'Gym'?"Search For Gym":
+                                currentCategory == 'Spa'?"Search For Spa":
+                                currentCategory == 'Pet Services'?'Search for Pet Services':
+                                'Search for Car Wash',
                                 prefixIcon: Icon(Icons.search),
                               ),
                             ),

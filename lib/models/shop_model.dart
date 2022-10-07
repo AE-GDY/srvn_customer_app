@@ -4,6 +4,7 @@ class Shop{
 
   String shopName;
   String shopAddress;
+  String imageUrl;
   int shopReviewAmount;
   dynamic shopRating;
   String shopCategory;
@@ -12,6 +13,7 @@ class Shop{
   Shop(
       {
         required this.shopName,
+        required this.imageUrl,
         required this.shopAddress,
         required this.shopReviewAmount,
         required this.shopRating,

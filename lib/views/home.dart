@@ -8,11 +8,13 @@ import 'package:booking_app/widgets/barbershop.dart';
 import 'package:booking_app/widgets/bottomnavigator.dart';
 import 'package:booking_app/widgets/search.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/svg.dart';
 import '../models/saloonshop.dart';
 import '../widgets/searchh.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -30,6 +32,8 @@ class _HomeState extends State<Home> {
     'Haircut',
     'Beard'
   ];
+
+  List<Color?> colors = [Colors.deepPurple[50],Colors.orange[100],Colors.red[50],Colors.blueAccent];
 
 
   List<Shop> allShops = [];
@@ -69,6 +73,16 @@ class _HomeState extends State<Home> {
   Future<Map<String, dynamic>?> gymData() async {
     return (await FirebaseFirestore.instance.collection('shops').
     doc('Gym').get()).data();
+  }
+
+  Future<Map<String, dynamic>?> petData() async {
+    return (await FirebaseFirestore.instance.collection('shops').
+    doc('Pet Services').get()).data();
+  }
+
+  Future<Map<String, dynamic>?> carData() async {
+    return (await FirebaseFirestore.instance.collection('shops').
+    doc('Car Wash').get()).data();
   }
 
   Future<Map<String, dynamic>?> topShopsData() async {
@@ -278,139 +292,217 @@ class _HomeState extends State<Home> {
   );
 
 
+  /*
+  @override
+  void initState() {
+    getConnectivity();
+    super.initState();
+  }
+
+  getConnectivity() =>
+      subscription = Connectivity().onConnectivityChanged.listen(
+            (ConnectivityResult result) async {
+          isDeviceConnected = await InternetConnectionChecker().hasConnection;
+          if (!isDeviceConnected && isAlertSet == false) {
+            showDialogBox();
+            setState(() => isAlertSet = true);
+          }
+        },
+      );
+
+
+
+
+
+  //late Future<ConnectivityResult> result;
+
+@override
+  void initState() {
+    super.initState();
+    InternetConnectionChecker().onStatusChange.listen((event) {
+      final hasInternet = (event == InternetConnectionStatus.connected);
+
+      setState(() {
+        this.hasInternet = hasInternet;
+      });
+
+    });
+
+
+  }
+
+
+  */
+
+  bool hasInternet = true;
+
+
+  final Connectivity _connectivity = Connectivity();
+
+
+
+
 
   @override
-
   Widget build(BuildContext context) {
+
 
     activeIndex = 0;
     return Scaffold(
-      bottomNavigationBar: NavigationBar2(),
+      bottomNavigationBar:hasInternet?NavigationBar2():null,
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
+          child: hasInternet?Column(
             children: [
-              Container(
-                height: 90,
-                decoration: BoxDecoration(
-                  color: Colors.deepPurple[100],
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: (MediaQuery.of(context).size.width / 100) * 5,
+              //SizedBox(height: 10,),
+              ClipPath(
+                //clipper: CustomClipPath(),
+                child: Container(
+                  height: 150,
+                  decoration: BoxDecoration(
+                    color: Colors.deepPurple[50],
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      FutureBuilder(
-                        future: Future.wait([hairsalonData(),barbershopData(),spaData(),gymData()]),
-                        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                          if(snapshot.connectionState == ConnectionState.done){
-                            if(snapshot.hasError){
-                              return const Text("There is an error");
-                            }
-                            else if(snapshot.hasData){
+                  //margin: EdgeInsets.all(10),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 0,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        FutureBuilder(
+                          future: Future.wait([hairsalonData(),barbershopData(),spaData(),gymData(),petData(), carData()]),
+                          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                            if(snapshot.connectionState == ConnectionState.done){
+                              if(snapshot.hasError){
+                                return const Text("There is an error");
+                              }
+                              else if(snapshot.hasData) {
 
-                              allShops = [];
+                                allShops = [];
 
-                              int categoryIndex = 0;
-                              while(categoryIndex < categoryList.length){
+                                int categoryIndex = 0;
+                                while(categoryIndex < categoryList.length){
 
-                                int shopIndex = 0;
-                                while(shopIndex <= snapshot.data[categoryIndex]['total-shop-amount']){
+                                  int shopIndex = 0;
+                                  while(shopIndex <= snapshot.data[categoryIndex]['total-shop-amount']){
 
-                                  dynamic currentRating = snapshot.data[categoryIndex]['$shopIndex']['reviews-rating'];
+                                    dynamic currentRating = snapshot.data[categoryIndex]['$shopIndex']['reviews-rating'];
 
-                                  dynamic ratingRounded = currentRating.toStringAsFixed(1);
+                                    dynamic ratingRounded = currentRating.toStringAsFixed(1);
 
-                                  Shop currentShop = Shop(
-                                      shopName: snapshot.data[categoryIndex]['$shopIndex']['shop-name'],
-                                      shopCategory: categoryList[categoryIndex].title,
-                                      shopAddress: snapshot.data[categoryIndex]['$shopIndex']['shop-address'],
-                                      shopReviewAmount: snapshot.data[categoryIndex]['$shopIndex']['reviews-amount']+1,
-                                      shopRating: ratingRounded,
-                                      shopIndex: shopIndex
-                                  );
+                                    Shop currentShop = Shop(
+                                        shopName: snapshot.data[categoryIndex]['$shopIndex']['shop-name'],
+                                        shopCategory: categoryList[categoryIndex].title,
+                                        shopAddress: snapshot.data[categoryIndex]['$shopIndex']['shop-address'],
+                                        shopReviewAmount: snapshot.data[categoryIndex]['$shopIndex']['reviews-amount']+1,
+                                        shopRating: ratingRounded,
+                                        imageUrl: snapshot.data[categoryIndex]['$shopIndex']['images']['${-1}'],
+                                        shopIndex: shopIndex
+                                    );
 
-                                  allShops.add(currentShop);
+                                    allShops.add(currentShop);
 
-                                  shopIndex++;
+                                    shopIndex++;
+                                  }
+
+                                  categoryIndex++;
                                 }
 
-                                categoryIndex++;
-                              }
 
-
-                              return Container(
-                                width: 250,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  //color: Colors.grey.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: TextField(
-                                  readOnly: true,
-                                  textAlignVertical: TextAlignVertical.center,
-                                  onTap: () async {
-                                    final finalresult = await showSearch(context: context, delegate: search_service(allServices: shopServices_name, shops: allShops));
-                                    setState(() {
-                                      selectedplace=finalresult!;
-                                      print(selectedplace);
-                                    });
-                                  },
-                                  decoration: InputDecoration(
-                                    enabledBorder: InputBorder.none,
-                                    focusedBorder: InputBorder.none,
-                                    hintText: "Search for Service",
-                                    prefixIcon: Icon(Icons.search),
+                                return Card(
+                                  elevation: 10.0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
                                   ),
-                                ),
-                              );
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    width: MediaQuery.of(context).size.width * 0.9,
+                                    height: 60,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      //border: Border.all(color: Colors.black,width: 1.0),
+                                      borderRadius: BorderRadius.circular(15),
+                                      /*
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 5,
+                                          blurRadius: 7,
+                                          offset: Offset(0, 3), // changes position of shadow
+                                        ),
+                                      ],
+                                      */
+                                    ),
+                                    child: Container(
+                                      alignment: Alignment.centerLeft,
+                                      child: TextField(
+                                        readOnly: true,
+                                        textAlignVertical: TextAlignVertical.center,
+
+                                        onTap: () async {
+                                          final finalresult = await showSearch(context: context, delegate: search_service(allServices: shopServices_name, shops: allShops));
+                                          setState(() {
+                                            selectedplace=finalresult!;
+                                            print(selectedplace);
+                                          });
+                                        },
+                                        decoration: InputDecoration(
+                                          enabledBorder: InputBorder.none,
+                                          focusedBorder: InputBorder.none,
+                                          hintText: "Book your services..",
+                                          prefixIcon: Icon(Icons.search),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
                             }
-                          }
-                          return const CircularProgressIndicator();
-                        },
+                            return const CircularProgressIndicator();
+                          },
 
-                      ),
+                        ),
 
-                     /*
-                      FutureBuilder(
-                        future: userData(),
-                        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                          if(snapshot.connectionState == ConnectionState.done){
-                            if(snapshot.hasError){
-                              return const Text("There is an error");
-                            }
-                            else if(snapshot.hasData){
+                       /*
+                        FutureBuilder(
+                          future: userData(),
+                          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                            if(snapshot.connectionState == ConnectionState.done){
+                              if(snapshot.hasError){
+                                return const Text("There is an error");
+                              }
+                              else if(snapshot.hasData){
 
-                              int notificationIndex = 0;
-                              int activeNotifications = 0;
+                                int notificationIndex = 0;
+                                int activeNotifications = 0;
 
-                              while(notificationIndex <= snapshot.data['$userLoggedInIndex']['notification-amount']){
+                                while(notificationIndex <= snapshot.data['$userLoggedInIndex']['notification-amount']){
 
-                                if(snapshot.data['$userLoggedInIndex']['notifications']['$notificationIndex']['viewed'] == false){
-                                  activeNotifications++;
+                                  if(snapshot.data['$userLoggedInIndex']['notifications']['$notificationIndex']['viewed'] == false){
+                                    activeNotifications++;
+                                  }
+
+                                  notificationIndex++;
                                 }
 
-                                notificationIndex++;
+
+                                return buttonWithIcon(
+                                  svgSrc: "assets/all_images/Bell.svg",
+                                  press: (){
+
+                                  },
+                                  numOfItems: (loggedIn == false)?0:activeNotifications,
+                                );
                               }
-
-
-                              return buttonWithIcon(
-                                svgSrc: "assets/all_images/Bell.svg",
-                                press: (){
-
-                                },
-                                numOfItems: (loggedIn == false)?0:activeNotifications,
-                              );
                             }
-                          }
-                          return const Text("Please wait");
-                        },
+                            return const Text("Please wait");
+                          },
 
-                      ),
-                     */
-                    ],
+                        ),
+                       */
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -481,7 +573,7 @@ class _HomeState extends State<Home> {
               ),
               SizedBox(height: 0,),
               Container(
-                height: MediaQuery.of(context).size.height / 4.7,
+                height: MediaQuery.of(context).size.height / 5,
                 child:ListView.builder(
                   shrinkWrap: true,
                   itemCount: categoryList.length,
@@ -490,23 +582,22 @@ class _HomeState extends State<Home> {
                   itemBuilder: (context, index){
                     var category = categoryList[index];
                     return Container(
-                      //margin: EdgeInsets.all(5),
-                      width: 110,
-                      height: 200,
+                      width: MediaQuery.of(context).size.width / 4,
                       child: Column(
                         children: [
-                          SizedBox(height: 5,),
+
                           Card(
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(30),
                             ),
-                            elevation: 3,
+                            elevation: 5,
                             child: Container(
                               height: 80,
                               width: 80,
                               padding: EdgeInsets.all((MediaQuery.of(context).size.width / 100) * 2),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                              //
+                                color: Colors.deepPurple[50],
                                 borderRadius: BorderRadius.circular(30),
                               ),
                               child: TextButton(
@@ -551,9 +642,30 @@ class _HomeState extends State<Home> {
                                     });
 
                                   }
+                                  else if(category.title == "Pet Services"){
+                                    setState(() {
+                                      currentCategory = "Pet Services";
+                                      onBarberShop = false;
+                                      onSpaShop = false;
+                                      onSaloonShop = false;
+                                      onGymShop = true;
+                                    });
+                                  }
+
+                                  else if(category.title == "Car Wash"){
+                                    setState(() {
+                                      currentCategory = "Car Wash";
+                                      onBarberShop = false;
+                                      onSpaShop = false;
+                                      onSaloonShop = false;
+                                      onGymShop = true;
+                                    });
+                                  }
 
                                   Navigator.pushNamed(context, '/shoplist');
                                 },
+
+                                //category.title == "Barbershop"?Image.asset(category.icon,width: 100,height: 100,):
                                 child: SvgPicture.asset(category.icon),
                               ),
                             ),
@@ -794,6 +906,52 @@ class _HomeState extends State<Home> {
 
 
             ],
+          ):Center(
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(height: MediaQuery.of(context).size.height / 5,),
+                  Icon(Icons.signal_wifi_connected_no_internet_4_rounded,size: 80,),
+                  Text('Connection Lost...', style: TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                  ),),
+                  SizedBox(height: MediaQuery.of(context).size.height / 4,),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.7,
+                    child: Text('Your connection seems to be down. Tap to try again', style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                    textAlign: TextAlign.center,),
+                  ),
+                  SizedBox(height: 20,),
+                  Container(
+                    //alignment: Alignment.bottomCenter,
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Colors.deepPurple,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: TextButton(
+                      onPressed: (){
+                        setState(() {
+                          hasInternet = hasInternet;
+                        });
+                      },
+                      child: Text("Try Again", style: TextStyle(
+                        color: Colors.white,
+                      ),),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -879,6 +1037,29 @@ class _buttonWithIconState extends State<buttonWithIcon> {
     );
   }
 
+}
 
+class CustomClipPath extends CustomClipper<Path> {
+
+  @override
+  Path getClip(Size size){
+    double w = size.width;
+    double h = size.height;
+
+    final path = Path();
+
+    path.lineTo(0,h);
+    path.quadraticBezierTo(w * 0.5, h - 40, w, h);
+    path.lineTo(w, 0);
+
+    path.close();
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper){
+    return false;
+  }
 
 }
