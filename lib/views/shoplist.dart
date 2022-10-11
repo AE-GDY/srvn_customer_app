@@ -60,18 +60,18 @@ class _shopListState extends State<shopList> {
   }
 
 
-  double calculateShopRating(AsyncSnapshot<dynamic> snapshot,int shopIndex, int currentRating){
+  double calculateShopRating(AsyncSnapshot<dynamic> snapshot,int categoryIndex,int shopIndex, int currentRating){
 
     print('1');
 
     num totalRatings = 0;
     int reviewIndex = 0;
-    while(reviewIndex <= snapshot.data['$shopIndex']['reviews-amount']){
-      totalRatings += snapshot.data['$shopIndex']['reviews']['$reviewIndex']['rating'];
+    while(reviewIndex <= snapshot.data[categoryIndex]['$shopIndex']['reviews-amount']){
+      totalRatings += snapshot.data[categoryIndex]['$shopIndex']['reviews']['$reviewIndex']['rating'];
       reviewIndex++;
     }
 
-    double newRating = (totalRatings + currentRating) / (snapshot.data['$shopIndex']['reviews-amount']+2);
+    double newRating = (totalRatings + currentRating) / (snapshot.data[categoryIndex]['$shopIndex']['reviews-amount']+2);
     print('2');
 
     newRating.toStringAsFixed(1);
@@ -211,20 +211,18 @@ class _shopListState extends State<shopList> {
                               bool foundCategory = false;
                               int categoryIndex = 0;
                               while(categoryIndex < categoryList.length){
-
                                 int shopIndex = 0;
-                                while(shopIndex <= snapshot.data[categoryList[categoryIndex].title]['total-shop-amount']){
-
-                                  if(sender == snapshot.data[categoryList[categoryIndex].title]['$shopIndex']['shop-name']){
-
-                                    double newShopRating = calculateShopRating(snapshot,shopIndex, currentRating);
-
+                                while(shopIndex <= snapshot.data[categoryIndex]['total-shop-amount']){
+                                  if(sender == snapshot.data[categoryIndex]['$shopIndex']['shop-name']){
+                                    print('4');
+                                    double newShopRating = calculateShopRating(snapshot,categoryIndex,shopIndex, currentRating);
+                                    print('5');
                                     foundCategory = true;
 
                                     await databaseService.addReview(
                                         currentCategory,
                                         shopIndex,
-                                        snapshot.data[categoryList[categoryIndex].title]['$shopIndex']['reviews-amount']+1,
+                                        snapshot.data[categoryIndex]['$shopIndex']['reviews-amount']+1,
                                         reviewController.text,
                                         currentRating,
                                         userName,

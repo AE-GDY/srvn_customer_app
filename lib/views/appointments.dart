@@ -82,10 +82,17 @@ class _AppointmentListState extends State<AppointmentList> {
 
                         bool currentTimeGreaterThanAppointmentTime = false;
 
-                        if(DateTime.now().day >= snapshot.data['$userLoggedInIndex']['appointments']['$index']['start-day']
-                        &&DateTime.now().day >= snapshot.data['$userLoggedInIndex']['appointments']['$index']['start-month']
-                        && DateTime.now().day >= snapshot.data['$userLoggedInIndex']['appointments']['$index']['start-year']){
+                        if(DateTime.now().day == snapshot.data['$userLoggedInIndex']['appointments']['$index']['start-day']
+                        &&DateTime.now().month == snapshot.data['$userLoggedInIndex']['appointments']['$index']['start-month']
+                        && DateTime.now().year == snapshot.data['$userLoggedInIndex']['appointments']['$index']['start-year']){
+
                           currentTimeGreaterThanAppointmentTime = isGreater(currentTime,snapshot.data['$userLoggedInIndex']['appointments']['$index']['end-time']);
+
+                        }
+                        else if(DateTime.now().day > snapshot.data['$userLoggedInIndex']['appointments']['$index']['start-day']
+                            &&DateTime.now().month >= snapshot.data['$userLoggedInIndex']['appointments']['$index']['start-month']
+                            && DateTime.now().year >= snapshot.data['$userLoggedInIndex']['appointments']['$index']['start-year']){
+                          currentTimeGreaterThanAppointmentTime = true;
                         }
 
 
