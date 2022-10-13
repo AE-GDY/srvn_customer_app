@@ -23,6 +23,8 @@ class _CurrentShopState extends State<CurrentShop> {
 
   List<Service> allItems = [];
 
+  bool userIsMember = false;
+
   List<String> shopServices_name = [];
   String selectedplace='';
   final List<String> suggestedServices =[
@@ -371,6 +373,19 @@ class _CurrentShopState extends State<CurrentShop> {
                     shopMembershipIndex++;
                   }
 
+                  int membershipIndex = 0;
+                  if(loggedIn){
+                    while(membershipIndex <= snapshot.data[1]['$userLoggedInIndex']['membership-amount']){
+
+                      if(snapshot.data[1]['$userLoggedInIndex']['memberships']['$membershipIndex']['membership-shop'] == currentShop){
+                        userIsMember = true;
+                        break;
+                      }
+
+                      membershipIndex++;
+                    }
+                  }
+
 
                   return Container(
                     child: ListView.builder(
@@ -497,6 +512,8 @@ class _CurrentShopState extends State<CurrentShop> {
                             (currentMembership != '' && loggedIn)?isDiscounted:false,
                             discountedIndex,
                             discounts,
+                            snapshot.data![0]['$currentShopIndex']['services']['$index']['members-only'],
+                            userIsMember,
                         );
                       },
                     ),
@@ -576,6 +593,8 @@ class _CurrentShopState extends State<CurrentShop> {
                             false,
                             0,
                             [],
+                            snapshot.data![0]['$currentShopIndex']['services']['$index']['members-only'],
+                            userIsMember
                         );
                       },
                     ),
@@ -631,7 +650,6 @@ class _CurrentShopState extends State<CurrentShop> {
                 }
                 else if(snapshot.hasData){
 
-                  bool userIsMember = false;
                   String userMembershipName = "";
                   int membershipIndex = 0;
 
@@ -999,7 +1017,10 @@ class ServiceTile extends StatelessWidget {
   String maxAmountPerTiming;
   bool isInMembership;
   bool isDiscounted;
+  bool membersOnly;
   int discountedIndex;
+  bool isMember;
+
   List<dynamic> discounts;
   ServiceTile(
       this.serviceName,
@@ -1017,6 +1038,8 @@ class ServiceTile extends StatelessWidget {
       this.isDiscounted,
       this.discountedIndex,
       this.discounts,
+      this.membersOnly,
+      this.isMember
       );
 
   @override
@@ -1145,7 +1168,7 @@ class ServiceTile extends StatelessWidget {
 
               Navigator.pushNamed(context, '/bookingscreen');
             },
-            color: Colors.deepPurple,
+            color: !isMember && membersOnly?Colors.grey:Colors.deepPurple,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),

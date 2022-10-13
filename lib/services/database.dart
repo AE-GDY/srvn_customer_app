@@ -117,7 +117,7 @@ class DatabaseService{
     );
   }
 
-  Future addClient(String category, int currentShopIdx, int clientAmount, String clientName, String clientEmail) async {
+  Future addClient(String category, int currentShopIdx, int clientAmount, String clientName, String clientEmail, String clientNumber) async {
     return await shops.doc(category).set({
       '$currentShopIdx' : {
         'client-amount':clientAmount,
@@ -126,6 +126,7 @@ class DatabaseService{
             'type': 'new',
             'name': clientName,
             'email': clientEmail,
+            'phone': clientNumber,
             'month': months[DateTime.now().month -1],
             'appointments':0,
             'amount-paid': 0,
@@ -213,7 +214,7 @@ class DatabaseService{
   }
 
 
-  Future signUpUser(String name,String email, String password, int userIndex) async {
+  Future signUpUser(String name,String email, String phoneNumber,String password, int userIndex) async {
     return await users.doc("signed-up").set({
       '$userIndex' : {
         'appointment-amount': -1,
@@ -223,6 +224,7 @@ class DatabaseService{
         'notifications': {},
         'appointments': {},
         'full-name': name,
+        'phone-number': phoneNumber,
         'email': email,
         'password': password,
         'user-index': userIndex,

@@ -116,6 +116,7 @@ class _HomeState extends State<Home> {
 
     return newRating;
   }
+
   int currentRating = 0;
   TextEditingController reviewController = TextEditingController();
 
@@ -316,32 +317,23 @@ class _HomeState extends State<Home> {
 
   //late Future<ConnectivityResult> result;
 
-@override
-  void initState() {
-    super.initState();
-    InternetConnectionChecker().onStatusChange.listen((event) {
-      final hasInternet = (event == InternetConnectionStatus.connected);
-
-      setState(() {
-        this.hasInternet = hasInternet;
-      });
-
-    });
-
-
-  }
-
 
   */
 
-  bool hasInternet = true;
+
+  @override
+  void initState() {
+    super.initState();
+    InternetConnectionChecker().onStatusChange.listen((event) {
+      setState(() {
+        hasInternet = (event == InternetConnectionStatus.connected);
+      });
+    });
+  }
+
 
 
   final Connectivity _connectivity = Connectivity();
-
-
-
-
 
   @override
   Widget build(BuildContext context) {

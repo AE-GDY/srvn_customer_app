@@ -303,6 +303,7 @@ class _PaymentState extends State<Payment> {
                                   snapshot.data[0]['$currentShopIndex']['client-amount']+1,
                                   snapshot.data[1]['$userLoggedInIndex']['full-name'],
                                   snapshot.data[1]['$userLoggedInIndex']['email'],
+                                  snapshot.data[1]['$userLoggedInIndex']['phone-number'],
                                 );
                               }
                               Navigator.pushNamed(context, '/booked');

@@ -92,6 +92,8 @@ final kBoxDecorationStyle = BoxDecoration(
   */
 );
 
+bool hasInternet = false;
+
 
 // STORES APPOINTMENT LIST
 List<Map<dynamic, dynamic>> appointmentList = [

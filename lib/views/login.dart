@@ -24,6 +24,8 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController nameController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+
 
   Future<Map<String, dynamic>?> userData() async {
     return (await FirebaseFirestore.instance.collection('users').
@@ -105,6 +107,50 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ],
     );
+  }
+
+  // PHONE NUMBER WIDGET
+  Widget _buildPhoneNumberTF() {
+    if(!onLoginScreen){
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'Phone Number',
+            style: kLabelStyle,
+          ),
+          SizedBox(height: 10.0),
+          Container(
+            alignment: Alignment.centerLeft,
+            decoration: kBoxDecorationStyle,
+            height: 60.0,
+            // TEXT FIELD IS FOR THE PLACE TO ENTER EMAIL
+            child: TextFormField(
+              controller: phoneController,
+              keyboardType: TextInputType.emailAddress,
+              style: TextStyle(
+                color: Colors.black,
+                fontFamily: 'OpenSans',
+              ),
+              validator: (value){
+
+              },
+              decoration: InputDecoration(
+                //  border: InputBorder.none,
+                contentPadding: EdgeInsets.only(top: 14.0),
+                prefixIcon: Icon(
+                  Icons.email,
+                  color: Colors.black,
+                ),
+                hintText: 'Enter your phone number',
+                hintStyle: kHintTextStyle,
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+    return Container();
   }
 
   Widget _buildNameTF() {
@@ -354,6 +400,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       await databaseService.signUpUser(
                         nameController.text,
                         emailController.text,
+                        phoneController.text,
                         passwordController.text,
                         snapshot.data[1]['total-user-amount'] + 1,
                       );
@@ -501,6 +548,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               snapshot.data![0]['$currentShopIndex']['client-amount']+1,
                               snapshot.data![1]['$userLoggedInIndex']['full-name'],
                               snapshot.data![1]['$userLoggedInIndex']['email'],
+                              snapshot.data![1]['$userLoggedInIndex']['phone-number'],
                             );
                           }
 
@@ -690,8 +738,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         _buildNameTF(),
                         SizedBox(height: 30.0),
                         _buildEmailTF(),
+                        SizedBox(height: 30.0),
+                        _buildPhoneNumberTF(),
                         SizedBox(
-                          height: 30.0,
+                          height: onLoginScreen?0:30.0,
                         ),
                         _buildPasswordTF(),
                         _buildForgotPasswordBtn(),

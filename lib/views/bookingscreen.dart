@@ -904,6 +904,7 @@ class _BarberTimeState extends State<BarberTime> {
                                                           snapshot.data![0]['$currentShopIndex']['client-amount']+1,
                                                           snapshot.data![1]['$userLoggedInIndex']['full-name'],
                                                           snapshot.data![1]['$userLoggedInIndex']['email'],
+                                                          snapshot.data![1]['$userLoggedInIndex']['phone-number'],
                                                         );
                                                       }
                                                       Navigator.pushNamed(context, '/booked');
@@ -1227,6 +1228,7 @@ class _BarberTimeState extends State<BarberTime> {
                                                             snapshot.data[0]['$currentShopIndex']['client-amount']+1,
                                                             snapshot.data[1]['$userLoggedInIndex']['full-name'],
                                                             snapshot.data[1]['$userLoggedInIndex']['email'],
+                                                            snapshot.data[1]['$userLoggedInIndex']['phone-number'],
                                                           );
                                                         }
                                                         Navigator.pushNamed(context, '/booked');
