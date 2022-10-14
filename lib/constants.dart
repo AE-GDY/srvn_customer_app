@@ -93,6 +93,7 @@ final kBoxDecorationStyle = BoxDecoration(
 );
 
 bool hasInternet = false;
+bool globalRequiresConfirmation = false;
 
 
 // STORES APPOINTMENT LIST

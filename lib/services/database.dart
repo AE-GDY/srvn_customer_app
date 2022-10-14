@@ -32,9 +32,12 @@ class DatabaseService{
   }
 
   Future addAppointment(
+      int userIndex,
+      bool requiresConfirmation,
       String dayOfWeek,
       String name,
       String email,
+      String number,
       String category,
       int currentShopIdx,
       int appointmentAmount,
@@ -66,8 +69,11 @@ class DatabaseService{
       '$currentShopIdx' : {
         'appointments':{
           '$appointmentAmount':{
+
+            'user-index': userIndex,
             'user-appointment-index': userAppointmentIndex,
-            'appointment-status': 'incomplete',
+
+            'appointment-status': requiresConfirmation?'pending-confirmation':'incomplete',
             'appointment-type': type,
             'day-words': dayOfWeek,
             'start-year': startYear,
@@ -89,6 +95,7 @@ class DatabaseService{
 
             'client-name': name,
             'client-email': email,
+            'client-number': number,
             'service-name': serviceName,
             'service-price': servicePrice,
             'service-duration': serviceDuration,
@@ -260,7 +267,9 @@ class DatabaseService{
     );
   }
 
-  Future updateUserAppointments(int appointmentIndex,
+  Future updateUserAppointments(
+      bool pendingConfirmation,
+      int appointmentIndex,
       int userIndex,
       String dateBooked,
       String serviceBooked,
@@ -279,6 +288,7 @@ class DatabaseService{
       '$userIndex' : {
         'appointments':{
           '$appointmentIndex': {
+            'pending-confirmation': pendingConfirmation,
             'appointment-status':true,
             'date-booked': dateBooked,
             'service-booked': serviceBooked,

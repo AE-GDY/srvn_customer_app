@@ -108,7 +108,7 @@ class _AppointmentListState extends State<AppointmentList> {
                           return Container(
                             margin: EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey.shade400,width: 2),
+                              border: Border.all(color: Colors.deepPurple,width: 2),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Card(
@@ -182,7 +182,7 @@ class _AppointmentListState extends State<AppointmentList> {
                                     ),
                                     SizedBox(height: 5,),
                                     Container(
-                                      child: Text("${snapshot.data['$userLoggedInIndex']['appointments']['$index']['service-booked']}",
+                                      child: Text("${snapshot.data['$userLoggedInIndex']['appointments']['$index']['service-booked']}, ${snapshot.data['$userLoggedInIndex']['appointments']['$index']['duration-booked']}",
                                         style: TextStyle(
                                           fontSize: 15,
                                         ),),
@@ -202,23 +202,55 @@ class _AppointmentListState extends State<AppointmentList> {
                                           fontSize: 15,
                                         ),),
                                     ),
-                                    SizedBox(height: 10,),
+                                    SizedBox(height: 5,),
                                     Container(
-                                      child: Text("Duration",
+                                      child: Text("Time",
                                         style: TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
                                         ),),
                                     ),
                                     SizedBox(height: 5,),
+                                    Container(
+                                      child: Text("${snapshot.data['$userLoggedInIndex']['appointments']['$index']['start-time']}-${snapshot.data['$userLoggedInIndex']['appointments']['$index']['end-time']}",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                        ),),
+                                    ),
+                                    SizedBox(height: 10,),
 
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
+
+
+                                        snapshot.data['$userLoggedInIndex']['appointments']['$index']['pending-confirmation'] ?
                                         Container(
-                                          child: Text("${snapshot.data['$userLoggedInIndex']['appointments']['$index']['duration-booked']}",style: TextStyle(
-                                            fontSize: 20,
-                                          ),),
+                                          width: 180,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                            color: Colors.deepOrange,
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: TextButton(
+                                            onPressed: (){},
+                                            child: Text('Pending Confirmation',style: TextStyle(
+                                              color: Colors.white,
+                                            ),),
+                                          ),
+                                        ):Container(
+                                          width: 180,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                            color: Colors.green,
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: TextButton(
+                                            onPressed: (){},
+                                            child: Text('Confirmed',style: TextStyle(
+                                              color: Colors.white,
+                                            ),),
+                                          ),
                                         ),
 
                                         Container(

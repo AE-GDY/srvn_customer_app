@@ -202,9 +202,11 @@ class _PaymentState extends State<Payment> {
                                 print("2");
 
                                 await databaseService.addAppointment(
+                                  globalRequiresConfirmation,
                                   globalDayWords,
                                   snapshot.data[1]['$userLoggedInIndex']['full-name'],
                                   snapshot.data[1]['$userLoggedInIndex']['email'],
+                                  snapshot.data![1]['$userLoggedInIndex']['phone-number'],
                                   currentCategory,
                                   currentShopIndex,
                                   snapshot.data[0]['$currentShopIndex']['appointments']['appointment-amount']+1,
@@ -238,6 +240,7 @@ class _PaymentState extends State<Payment> {
 
 
                                 await databaseService.updateUserAppointments(
+                                  globalRequiresConfirmation,
                                   snapshot.data[1]["$userLoggedInIndex"]['appointment-amount']+1,
                                   userLoggedInIndex,
                                   "${onCalender?globalDay:DateTime.now().day} ${onCalender?DateFormat.LLLL().format(timePicked):DateFormat.LLLL().format(DateTime.now())} ${onCalender?globalYear:DateTime.now().year}, $globalTime",

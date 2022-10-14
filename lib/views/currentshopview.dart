@@ -514,6 +514,7 @@ class _CurrentShopState extends State<CurrentShop> {
                             discounts,
                             snapshot.data![0]['$currentShopIndex']['services']['$index']['members-only'],
                             userIsMember,
+                            snapshot.data![0]['$currentShopIndex']['services']['$index']['requires-confirmation'],
                         );
                       },
                     ),
@@ -594,7 +595,8 @@ class _CurrentShopState extends State<CurrentShop> {
                             0,
                             [],
                             snapshot.data![0]['$currentShopIndex']['services']['$index']['members-only'],
-                            userIsMember
+                            userIsMember,
+                            snapshot.data![0]['$currentShopIndex']['services']['$index']['requires-confirmation'],
                         );
                       },
                     ),
@@ -1018,6 +1020,7 @@ class ServiceTile extends StatelessWidget {
   bool isInMembership;
   bool isDiscounted;
   bool membersOnly;
+  bool requiresConfirmation;
   int discountedIndex;
   bool isMember;
 
@@ -1039,7 +1042,8 @@ class ServiceTile extends StatelessWidget {
       this.discountedIndex,
       this.discounts,
       this.membersOnly,
-      this.isMember
+      this.isMember,
+      this.requiresConfirmation,
       );
 
   @override
@@ -1079,6 +1083,12 @@ class ServiceTile extends StatelessWidget {
                 ),
               ),
 
+              SizedBox(height: 5,),
+
+              !isMember && membersOnly?Text('Members only',style: TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+              ),):
               isInMembership?Container():
               isPromotion?Text('${serviceDiscount}% off',style: TextStyle(
                 fontWeight: FontWeight.bold,
@@ -1157,6 +1167,9 @@ class ServiceTile extends StatelessWidget {
               globalServiceLinked = serviceLinked;
               globalMinuteGap = minuteGap;
               globalMaxAmount = maxAmountPerTiming;
+
+              globalRequiresConfirmation = requiresConfirmation;
+
               typeOfItemSelected = tabSelected;
 
 

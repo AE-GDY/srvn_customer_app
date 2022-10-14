@@ -802,9 +802,12 @@ class _BarberTimeState extends State<BarberTime> {
                                                         print("2");
 
                                                         await databaseService.addAppointment(
+                                                          userLoggedInIndex,
+                                                          globalRequiresConfirmation,
                                                           globalDayWords,
                                                           snapshot.data![1]['$userLoggedInIndex']['full-name'],
                                                           snapshot.data![1]['$userLoggedInIndex']['email'],
+                                                          snapshot.data![1]['$userLoggedInIndex']['phone-number'],
                                                           currentCategory,
                                                           currentShopIndex,
                                                           snapshot.data![0]['$currentShopIndex']['appointments']['appointment-amount']+1,
@@ -839,9 +842,10 @@ class _BarberTimeState extends State<BarberTime> {
                                                         globalTime = '$globalStartTime-$globalEndTime';
 
                                                         await databaseService.updateUserAppointments(
+                                                          globalRequiresConfirmation,
                                                           snapshot.data![1]["$userLoggedInIndex"]['appointment-amount']+1,
                                                           userLoggedInIndex,
-                                                          "${onCalender?globalDay:DateTime.now().day} ${onCalender?DateFormat.LLLL().format(timePicked):DateFormat.LLLL().format(DateTime.now())} ${onCalender?globalYear:DateTime.now().year}, $globalTime",
+                                                          "${onCalender?globalDay:DateTime.now().day} ${onCalender?DateFormat.LLLL().format(timePicked):DateFormat.LLLL().format(DateTime.now())} ${onCalender?globalYear:DateTime.now().year}",
                                                           serviceBooked,
                                                           currentShop,
                                                           serviceDuration,
