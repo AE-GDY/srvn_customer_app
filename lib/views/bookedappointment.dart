@@ -40,7 +40,7 @@ class _SuccessfulBookingState extends State<SuccessfulBooking> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: globalRequiresConfirmation?Colors.deepOrange:Colors.white,
       body: Center(
         child: Container(
           width: MediaQuery.of(context).size.width,
@@ -52,9 +52,9 @@ class _SuccessfulBookingState extends State<SuccessfulBooking> {
 
               SizedBox(height: MediaQuery.of(context).size.height/5,),
 
-              typeOfItemSelected != 'Memberships'?Text("Appointment Confirmed!", style: TextStyle(
+              typeOfItemSelected != 'Memberships'?Text(globalRequiresConfirmation?"Pending Confirmation":"Appointment Confirmed!", style: TextStyle(
                 fontSize: 30,
-                color: Colors.black,
+                color: globalRequiresConfirmation?Colors.white:Colors.black,
                 fontWeight: FontWeight.bold,
               ),):Text("Membership Purchased!", style: TextStyle(
                 fontSize: 30,
@@ -64,7 +64,10 @@ class _SuccessfulBookingState extends State<SuccessfulBooking> {
 
               SizedBox(height: 10,),
 
-              Icon(Icons.check_circle, color: Colors.green,size: 150,),
+              Icon(globalRequiresConfirmation?Icons.calendar_today_rounded:Icons.check_circle,
+                color: globalRequiresConfirmation?Colors.white:Colors.green,
+                size: 150,
+              ),
 
               SizedBox(height: 40,),
 
@@ -84,7 +87,7 @@ class _SuccessfulBookingState extends State<SuccessfulBooking> {
               Text("$serviceBooked",
                 style: TextStyle(
                   fontSize: 18,
-                  color: Colors.grey[600],
+                  color: globalRequiresConfirmation?Colors.white:Colors.grey[600],
                   fontWeight: FontWeight.bold,
                 ),),
 
@@ -103,7 +106,7 @@ class _SuccessfulBookingState extends State<SuccessfulBooking> {
                   Text("${onCalender?globalDay:DateTime.now().day} ${onCalender?DateFormat.LLLL().format(timePicked):DateFormat.LLLL().format(DateTime.now())} ${onCalender?globalYear:DateTime.now().year}",
                     style: TextStyle(
                       fontSize: 18,
-                      color: Colors.grey[600],
+                      color: globalRequiresConfirmation?Colors.white:Colors.grey[600],
                       fontWeight: FontWeight.bold,
                     ),),
 
@@ -119,7 +122,7 @@ class _SuccessfulBookingState extends State<SuccessfulBooking> {
                   Text("$globalTime",
                     style: TextStyle(
                       fontSize: 18,
-                      color: Colors.grey[600],
+                      color: globalRequiresConfirmation?Colors.white:Colors.grey[600],
                       fontWeight: FontWeight.bold,
                     ),),
                 ],
@@ -140,18 +143,19 @@ class _SuccessfulBookingState extends State<SuccessfulBooking> {
                         width: 300,
                         height: 50,
                         decoration: BoxDecoration(
-                          color: Colors.deepPurple,
+                          color: globalRequiresConfirmation?Colors.white:Colors.deepPurple,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: MaterialButton(
                           onPressed: (){
 
+                            globalRequiresConfirmation = false;
                             bookingClicked = false;
                             Navigator.pushNamed(context, '/');
 
                           },
                           child: Text("Ok, got it!", style: TextStyle(
-                            color: Colors.white,
+                            color: globalRequiresConfirmation?Colors.black:Colors.white,
                           ),),
                         ),
                       );

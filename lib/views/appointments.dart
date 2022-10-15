@@ -86,6 +86,10 @@ class _AppointmentListState extends State<AppointmentList> {
                         &&DateTime.now().month == snapshot.data['$userLoggedInIndex']['appointments']['$index']['start-month']
                         && DateTime.now().year == snapshot.data['$userLoggedInIndex']['appointments']['$index']['start-year']){
 
+
+                          print('CURRENT TIME: $currentTime');
+                          print('END TIME: ${snapshot.data['$userLoggedInIndex']['appointments']['$index']['end-time']}');
+
                           currentTimeGreaterThanAppointmentTime = isGreater(currentTime,snapshot.data['$userLoggedInIndex']['appointments']['$index']['end-time']);
 
                         }
@@ -316,10 +320,13 @@ class _AppointmentListState extends State<AppointmentList> {
       }
     }
     if(secondTimeEnd == 'PM'){
-      if(secondTimeEnd != 12){
+      if(secondTimeHourInt != 12){
         secondTimeHourInt += 12;
       }
     }
+
+    print('first time hour: $firstTimeHourInt');
+    print('second time hour: $secondTimeHourInt');
 
     if(firstTimeHourInt == secondTimeHourInt){
       if(firstTimeMinuteInt >= secondTimeMinuteInt){

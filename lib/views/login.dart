@@ -446,6 +446,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             print("2");
 
                             await databaseService.addAppointment(
+                              userLoggedInIndex,
                               globalRequiresConfirmation,
                               globalDayWords,
                               snapshot.data![1]['$userLoggedInIndex']['full-name'],

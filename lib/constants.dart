@@ -92,7 +92,7 @@ final kBoxDecorationStyle = BoxDecoration(
   */
 );
 
-bool hasInternet = false;
+bool hasInternet = true;
 bool globalRequiresConfirmation = false;
 
 
