@@ -165,13 +165,18 @@ class _BarberTimeState extends State<BarberTime> {
                     initialCalendarSetup = false;
                   }
 
-                  return Container(
+                  double? appBarHeight = Scaffold.of(context).appBarMaxHeight;
 
+                  int? appBarHeightInt = appBarHeight?.round();
+
+                  return Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height - appBarHeightInt!,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        SizedBox(height: 10,),
+
                         buildStaffMembers(snapshot),
                         Divider(
                           height: 10,
@@ -479,7 +484,7 @@ class _BarberTimeState extends State<BarberTime> {
 
                         ),
 
-                        SizedBox(height: 30,),
+                        Expanded(child: Container(),),
 
 
                         Container(
@@ -1737,7 +1742,9 @@ class _BarberTimeState extends State<BarberTime> {
     // THEN WE CAN BEGIN TO CHECK IF THE TIME SELECTED IS OCCUPIED OR NOT
 
     if (snapshot.data['$currentShopIndex']['appointments']['$appointmentIndex']['appointment-status'] ==
-        'incomplete') {
+        'incomplete' ||
+        snapshot.data['$currentShopIndex']['appointments']['$appointmentIndex']['appointment-status'] ==
+    'pending-confirmation') {
       //print('X');
       if (snapshot.data['$currentShopIndex']['appointments']['$appointmentIndex']['member-name'] ==
           staffName) {

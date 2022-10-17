@@ -75,6 +75,16 @@ class _HomeState extends State<Home> {
     doc('Gym').get()).data();
   }
 
+  Future<Map<String, dynamic>?> restaurantData() async {
+    return (await FirebaseFirestore.instance.collection('shops').
+    doc('Restaurants').get()).data();
+  }
+
+  Future<Map<String, dynamic>?> localBrandData() async {
+    return (await FirebaseFirestore.instance.collection('shops').
+    doc('Local Brands').get()).data();
+  }
+
   Future<Map<String, dynamic>?> petData() async {
     return (await FirebaseFirestore.instance.collection('shops').
     doc('Pet Services').get()).data();
@@ -363,7 +373,7 @@ class _HomeState extends State<Home> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         FutureBuilder(
-                          future: Future.wait([hairsalonData(),barbershopData(),spaData(),gymData(),petData(), carData()]),
+                          future: Future.wait([hairsalonData(),barbershopData(),spaData(),gymData(),petData(), restaurantData(),localBrandData()]),
                           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                             if(snapshot.connectionState == ConnectionState.done){
                               if(snapshot.hasError){
@@ -644,9 +654,18 @@ class _HomeState extends State<Home> {
                                     });
                                   }
 
-                                  else if(category.title == "Car Wash"){
+                                  else if(category.title == "Restaurants"){
                                     setState(() {
-                                      currentCategory = "Car Wash";
+                                      currentCategory = "Restaurants";
+                                      onBarberShop = false;
+                                      onSpaShop = false;
+                                      onSaloonShop = false;
+                                      onGymShop = true;
+                                    });
+                                  }
+                                  else if(category.title == "Local Brands"){
+                                    setState(() {
+                                      currentCategory = "Local Brands";
                                       onBarberShop = false;
                                       onSpaShop = false;
                                       onSaloonShop = false;

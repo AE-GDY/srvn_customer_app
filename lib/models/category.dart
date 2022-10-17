@@ -42,8 +42,14 @@ List<Category> categoryList = [
     color: kIndigo,
   ),
   Category(
-    icon: "assets/all_images/car-wash-svgrepo-com.svg",
-    title: "Car Wash",
+    icon: "assets/all_images/restaurant_icon.svg",
+    title: "Restaurants",
+    subtitle: "15",
+    color: kIndigo,
+  ),
+  Category(
+    icon: "assets/all_images/local_brand_icon.svg",
+    title: "Local Brands",
     subtitle: "15",
     color: kIndigo,
   ),

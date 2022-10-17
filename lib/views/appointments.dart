@@ -227,7 +227,21 @@ class _AppointmentListState extends State<AppointmentList> {
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
 
-
+                                        snapshot.data['$userLoggedInIndex']['appointments']['$index']['declined'] ?
+                                        Container(
+                                          width: 180,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                            color: Colors.red,
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          child: TextButton(
+                                            onPressed: (){},
+                                            child: Text('Declined',style: TextStyle(
+                                              color: Colors.white,
+                                            ),),
+                                          ),
+                                        ):
                                         snapshot.data['$userLoggedInIndex']['appointments']['$index']['pending-confirmation'] ?
                                         Container(
                                           width: 180,

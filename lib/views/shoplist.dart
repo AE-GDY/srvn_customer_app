@@ -378,12 +378,13 @@ class _shopListState extends State<shopList> {
                               decoration: InputDecoration(
                                 enabledBorder: InputBorder.none,
                                 focusedBorder: InputBorder.none,
-                                hintText: currentCategory == 'Barbershop'?"Search For Barbershop":
-                                currentCategory == 'Hair Salon'?"Search For Hairsalon":
-                                currentCategory == 'Gym'?"Search For Gym":
-                                currentCategory == 'Spa'?"Search For Spa":
+                                hintText: currentCategory == 'Barbershop'?"Search For Barbershops":
+                                currentCategory == 'Hair Salon'?"Search For Hair salons":
+                                currentCategory == 'Gym'?"Search For Gyms":
+                                currentCategory == 'Spa'?"Search For Spas":
                                 currentCategory == 'Pet Services'?'Search for Pet Services':
-                                'Search for Car Wash',
+                                currentCategory == 'Restaurants'?'Search for Restaurants':
+                                'Search for Local Brands',
                                 prefixIcon: Icon(Icons.search),
                               ),
                             ),
