@@ -33,6 +33,9 @@ class _CurrentShopState extends State<CurrentShop> {
     'Devarana Sauna'
   ];
 
+  int numberOfPeople = 1;
+
+
 
   Future<Map<String, dynamic>?> categoryData() async {
     return (await FirebaseFirestore.instance.collection('shops').
@@ -187,10 +190,14 @@ class _CurrentShopState extends State<CurrentShop> {
               width: MediaQuery.of(context).size.width,
               height: 70,
               child: ListView.builder(
-                scrollDirection: Axis.horizontal,
+                  scrollDirection: Axis.horizontal,
                   physics: ScrollPhysics(),
                   itemCount: tabs.length,
                   itemBuilder: (context,index){
+
+                    if(currentCategory == 'Restaurants' && tabs[index] == 'Memberships'){
+                      return Container();
+                    }
 
                     return TextButton(
                       onPressed: (){
@@ -207,7 +214,10 @@ class _CurrentShopState extends State<CurrentShop> {
                       child: Column(
                         children: [
                           Text(
-                            tabs[index],
+                            currentCategory == 'Restaurants'
+                                && index == 0?'Reserve':
+                            currentCategory == 'Restaurants'
+                                && tabs[index] == 'Portfolio'?'Images':tabs[index],
                             style: TextStyle(
                               fontSize: 18,
                               color: Colors.black,
@@ -226,7 +236,7 @@ class _CurrentShopState extends State<CurrentShop> {
                       ),
                     );
 
-              }),
+                  }),
             ),
 
             Divider(
@@ -246,257 +256,258 @@ class _CurrentShopState extends State<CurrentShop> {
 
   Widget buildBody(){
     if(tabSelected == "Services"){
-      return Column(
-        children: [
-          Row(
-            children: [
-              SizedBox(width:10),
+      if(currentCategory != 'Restaurants'){
+        return Column(
+          children: [
+            Row(
+              children: [
+                SizedBox(width:10),
 
-              FutureBuilder(
-                future: categoryData(),
-                builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                  if(snapshot.connectionState == ConnectionState.done){
-                    if(snapshot.hasError){
-                      return const Text("There is an error");
-                    }
-                    else if(snapshot.hasData){
-                      return Container(
-                        width: (MediaQuery.of(context).size.width / 100) * 90,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: TextField(
-                          readOnly: true,
-                          textAlignVertical: TextAlignVertical.center,
-                          onTap: () async {
-
-                            allItems = [];
-
-                            if(tabSelected == 'Services'){
-                              int serviceIndex = 0;
-                              while(serviceIndex < snapshot.data['$currentShopIndex']['services-amount']){
-
-                                Service currentService = Service(
-                                  serviceIndex: serviceIndex,
-                                  name: snapshot.data['$currentShopIndex']['services']['$serviceIndex']['service-name'],
-                                  price: snapshot.data['$currentShopIndex']['services']['$serviceIndex']['service-price'],
-                                  duration: '${snapshot.data['$currentShopIndex']['services']['$serviceIndex']['service-hours']}${snapshot.data['$currentShopIndex']['services']['$serviceIndex']['service-minutes']}',
-                                );
-
-                                allItems.add(currentService);
-
-                                serviceIndex++;
-                              }
-                            }
-                            else{
-                              int membershipIndex = 0;
-                              while(membershipIndex <= snapshot.data['$currentShopIndex']['memberships-amount']){
-
-                                Service currentService = Service(
-                                  serviceIndex: membershipIndex,
-                                  name: snapshot.data['$currentShopIndex']['memberships']['$membershipIndex']['name'],
-                                  price: snapshot.data['$currentShopIndex']['memberships']['$membershipIndex']['price'],
-                                  duration: '${snapshot.data['$currentShopIndex']['memberships']['$membershipIndex']['duration']} month/s',
-                                );
-
-                                allItems.add(currentService);
-
-                                membershipIndex++;
-                              }
-                            }
-
-
-
-
-                            final finalresult = await showSearch(context: context, delegate: DataSearch(type: tabSelected,services: allItems));
-                          },
-                          decoration: InputDecoration(
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            hintText: "Search For Service",
-                            prefixIcon: Icon(Icons.search),
+                FutureBuilder(
+                  future: categoryData(),
+                  builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                    if(snapshot.connectionState == ConnectionState.done){
+                      if(snapshot.hasError){
+                        return const Text("There is an error");
+                      }
+                      else if(snapshot.hasData){
+                        return Container(
+                          width: (MediaQuery.of(context).size.width / 100) * 90,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(15),
                           ),
-                        ),
-                      );
+                          child: TextField(
+                            readOnly: true,
+                            textAlignVertical: TextAlignVertical.center,
+                            onTap: () async {
+
+                              allItems = [];
+
+                              if(tabSelected == 'Services'){
+                                int serviceIndex = 0;
+                                while(serviceIndex < snapshot.data['$currentShopIndex']['services-amount']){
+
+                                  Service currentService = Service(
+                                    serviceIndex: serviceIndex,
+                                    name: snapshot.data['$currentShopIndex']['services']['$serviceIndex']['service-name'],
+                                    price: snapshot.data['$currentShopIndex']['services']['$serviceIndex']['service-price'],
+                                    duration: '${snapshot.data['$currentShopIndex']['services']['$serviceIndex']['service-hours']}${snapshot.data['$currentShopIndex']['services']['$serviceIndex']['service-minutes']}',
+                                  );
+
+                                  allItems.add(currentService);
+
+                                  serviceIndex++;
+                                }
+                              }
+                              else{
+                                int membershipIndex = 0;
+                                while(membershipIndex <= snapshot.data['$currentShopIndex']['memberships-amount']){
+
+                                  Service currentService = Service(
+                                    serviceIndex: membershipIndex,
+                                    name: snapshot.data['$currentShopIndex']['memberships']['$membershipIndex']['name'],
+                                    price: snapshot.data['$currentShopIndex']['memberships']['$membershipIndex']['price'],
+                                    duration: '${snapshot.data['$currentShopIndex']['memberships']['$membershipIndex']['duration']} month/s',
+                                  );
+
+                                  allItems.add(currentService);
+
+                                  membershipIndex++;
+                                }
+                              }
+
+
+
+
+                              final finalresult = await showSearch(context: context, delegate: DataSearch(type: tabSelected,services: allItems));
+                            },
+                            decoration: InputDecoration(
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              hintText: "Search For Service",
+                              prefixIcon: Icon(Icons.search),
+                            ),
+                          ),
+                        );
+                      }
                     }
+                    return const CircularProgressIndicator();
+                  },
+
+                ),
+              ],
+            ),
+            SizedBox(height: 10,),
+
+
+            FutureBuilder(
+              future: Future.wait([categoryData(),userData()]),
+              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                if(snapshot.connectionState == ConnectionState.done){
+                  if(snapshot.hasError){
+                    return const Text("There is an error");
                   }
-                  return const CircularProgressIndicator();
-                },
-
-              ),
-            ],
-          ),
-          SizedBox(height: 10,),
+                  else if(snapshot.hasData){
 
 
-          FutureBuilder(
-            future: Future.wait([categoryData(),userData()]),
-            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-              if(snapshot.connectionState == ConnectionState.done){
-                if(snapshot.hasError){
-                  return const Text("There is an error");
-                }
-                else if(snapshot.hasData){
-
-
-                  String currentMembership = "";
-                  List<dynamic> membershipServices = [];
-                  List<dynamic> discountedServices = [];
-                  List<dynamic> discounts = [];
+                    String currentMembership = "";
+                    List<dynamic> membershipServices = [];
+                    List<dynamic> discountedServices = [];
+                    List<dynamic> discounts = [];
 
 
 
-                  int shopMembersIndex = 0;
-                  while(shopMembersIndex <= snapshot.data[0]['$currentShopIndex']['members-amount']){
+                    int shopMembersIndex = 0;
+                    while(shopMembersIndex <= snapshot.data[0]['$currentShopIndex']['members-amount']){
 
-                    if(snapshot.data[0]['$currentShopIndex']['members']['$shopMembersIndex']['email'] == snapshot.data[1]['$userLoggedInIndex']['email']){
-                      currentMembership = snapshot.data[0]['$currentShopIndex']['members']['$shopMembersIndex']['membership-type'];
-                      break;
-                    }
-
-                    shopMembersIndex++;
-
-                  }
-
-                  int shopMembershipIndex = 0;
-                  while(shopMembershipIndex <= snapshot.data[0]['$currentShopIndex']['memberships-amount']){
-
-                    if(currentMembership == snapshot.data[0]['$currentShopIndex']['memberships']['$shopMembershipIndex']['name']){
-                      membershipServices = snapshot.data[0]['$currentShopIndex']['memberships']['$shopMembershipIndex']['selected-services'];
-                      discountedServices = snapshot.data[0]['$currentShopIndex']['memberships']['$shopMembershipIndex']['selected-discounted-services'];
-                      discounts = snapshot.data[0]['$currentShopIndex']['memberships']['$shopMembershipIndex']['selected-discounted-services-percentages'];
-                      break;
-                    }
-
-                    shopMembershipIndex++;
-                  }
-
-                  int membershipIndex = 0;
-                  if(loggedIn){
-                    while(membershipIndex <= snapshot.data[1]['$userLoggedInIndex']['membership-amount']){
-
-                      if(snapshot.data[1]['$userLoggedInIndex']['memberships']['$membershipIndex']['membership-shop'] == currentShop){
-                        userIsMember = true;
+                      if(snapshot.data[0]['$currentShopIndex']['members']['$shopMembersIndex']['email'] == snapshot.data[1]['$userLoggedInIndex']['email']){
+                        currentMembership = snapshot.data[0]['$currentShopIndex']['members']['$shopMembersIndex']['membership-type'];
                         break;
                       }
 
-                      membershipIndex++;
+                      shopMembersIndex++;
+
                     }
-                  }
+
+                    int shopMembershipIndex = 0;
+                    while(shopMembershipIndex <= snapshot.data[0]['$currentShopIndex']['memberships-amount']){
+
+                      if(currentMembership == snapshot.data[0]['$currentShopIndex']['memberships']['$shopMembershipIndex']['name']){
+                        membershipServices = snapshot.data[0]['$currentShopIndex']['memberships']['$shopMembershipIndex']['selected-services'];
+                        discountedServices = snapshot.data[0]['$currentShopIndex']['memberships']['$shopMembershipIndex']['selected-discounted-services'];
+                        discounts = snapshot.data[0]['$currentShopIndex']['memberships']['$shopMembershipIndex']['selected-discounted-services-percentages'];
+                        break;
+                      }
+
+                      shopMembershipIndex++;
+                    }
+
+                    int membershipIndex = 0;
+                    if(loggedIn){
+                      while(membershipIndex <= snapshot.data[1]['$userLoggedInIndex']['membership-amount']){
+
+                        if(snapshot.data[1]['$userLoggedInIndex']['memberships']['$membershipIndex']['membership-shop'] == currentShop){
+                          userIsMember = true;
+                          break;
+                        }
+
+                        membershipIndex++;
+                      }
+                    }
 
 
-                  return Container(
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: snapshot.data![0]['$currentShopIndex']['services-amount'],
-                      scrollDirection: Axis.vertical,
-                      physics: ScrollPhysics(),
-                      itemBuilder: (context, index){
+                    return Container(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: snapshot.data![0]['$currentShopIndex']['services-amount'],
+                        scrollDirection: Axis.vertical,
+                        physics: ScrollPhysics(),
+                        itemBuilder: (context, index){
 
-                        String servicePrice = "";
-                        String discountedPrice = "";
+                          String servicePrice = "";
+                          String discountedPrice = "";
 
-                        bool promotionFound = false;
+                          bool promotionFound = false;
 
-                        String promotionDiscount = "";
+                          String promotionDiscount = "";
 
 
 
-                        // This while loop will check if there are any flash promotions that are active depending on today's date
-                        int promotionIndex = 0;
-                        int startMonth = 0;
-                        int endMonth = 0;
-                        while(promotionIndex < snapshot.data![0]['$currentShopIndex']['services']['$index']['flash-promotions-amount']){
+                          // This while loop will check if there are any flash promotions that are active depending on today's date
+                          int promotionIndex = 0;
+                          int startMonth = 0;
+                          int endMonth = 0;
+                          while(promotionIndex < snapshot.data![0]['$currentShopIndex']['services']['$index']['flash-promotions-amount']){
 
-                          int startDay = int.parse(snapshot.data![0]['$currentShopIndex']['services']['$index']['flash-promotions']['$promotionIndex']['promotion-start-day']);
-                          int startYear = int.parse(snapshot.data![0]['$currentShopIndex']['services']['$index']['flash-promotions']['$promotionIndex']['promotion-start-year']);
+                            int startDay = int.parse(snapshot.data![0]['$currentShopIndex']['services']['$index']['flash-promotions']['$promotionIndex']['promotion-start-day']);
+                            int startYear = int.parse(snapshot.data![0]['$currentShopIndex']['services']['$index']['flash-promotions']['$promotionIndex']['promotion-start-year']);
 
-                          int endDay = int.parse(snapshot.data![0]['$currentShopIndex']['services']['$index']['flash-promotions']['$promotionIndex']['promotion-end-day']);
-                          int endYear = int.parse(snapshot.data![0]['$currentShopIndex']['services']['$index']['flash-promotions']['$promotionIndex']['promotion-end-year']);
+                            int endDay = int.parse(snapshot.data![0]['$currentShopIndex']['services']['$index']['flash-promotions']['$promotionIndex']['promotion-end-day']);
+                            int endYear = int.parse(snapshot.data![0]['$currentShopIndex']['services']['$index']['flash-promotions']['$promotionIndex']['promotion-end-year']);
 
-                          // Converting month string to int
-                          int monthIndex = 0;
-                          while(monthIndex < months.length){
+                            // Converting month string to int
+                            int monthIndex = 0;
+                            while(monthIndex < months.length){
 
-                            print(months[monthIndex]);
+                              print(months[monthIndex]);
 
-                            if(months[monthIndex] == snapshot.data![0]['$currentShopIndex']['services']['$index']['flash-promotions']['$promotionIndex']['promotion-start-month']){
+                              if(months[monthIndex] == snapshot.data![0]['$currentShopIndex']['services']['$index']['flash-promotions']['$promotionIndex']['promotion-start-month']){
 
-                              print("found start month");
-                              startMonth = monthIndex + 1;
+                                print("found start month");
+                                startMonth = monthIndex + 1;
+                              }
+                              if(months[monthIndex] == snapshot.data![0]['$currentShopIndex']['services']['$index']['flash-promotions']['$promotionIndex']['promotion-end-month']){
+                                print("found end month");
+                                endMonth = monthIndex + 1;
+                              }
+
+                              monthIndex++;
+
                             }
-                            if(months[monthIndex] == snapshot.data![0]['$currentShopIndex']['services']['$index']['flash-promotions']['$promotionIndex']['promotion-end-month']){
-                              print("found end month");
-                              endMonth = monthIndex + 1;
-                            }
 
-                            monthIndex++;
+                            print("start date: $startDay/$startMonth/$startYear");
+                            print("end date: $endDay/$endMonth/$endYear");
 
-                          }
+                            if(DateTime.now().year >= startYear && DateTime.now().year <= endYear){
+                              if(DateTime.now().month >= startMonth && DateTime.now().month <= endMonth){
+                                if(DateTime.now().day >= startDay && DateTime.now().day <= endDay){
 
-                          print("start date: $startDay/$startMonth/$startYear");
-                          print("end date: $endDay/$endMonth/$endYear");
+                                  int percentageDiscount = int.parse(snapshot.data![0]['$currentShopIndex']['services']['$index']['flash-promotions']['$promotionIndex']['promotion-discount']);
+                                  int serviceOriginalPrice = int.parse(snapshot.data![0]['$currentShopIndex']['services']['$index']['service-price']);
 
-                          if(DateTime.now().year >= startYear && DateTime.now().year <= endYear){
-                            if(DateTime.now().month >= startMonth && DateTime.now().month <= endMonth){
-                              if(DateTime.now().day >= startDay && DateTime.now().day <= endDay){
+                                  double newServicePrice = serviceOriginalPrice - (serviceOriginalPrice * (percentageDiscount / 100));
 
-                                int percentageDiscount = int.parse(snapshot.data![0]['$currentShopIndex']['services']['$index']['flash-promotions']['$promotionIndex']['promotion-discount']);
-                                int serviceOriginalPrice = int.parse(snapshot.data![0]['$currentShopIndex']['services']['$index']['service-price']);
+                                  discountedPrice = '${newServicePrice.round()}';
 
-                                double newServicePrice = serviceOriginalPrice - (serviceOriginalPrice * (percentageDiscount / 100));
+                                  promotionDiscount = '$percentageDiscount';
 
-                                discountedPrice = '${newServicePrice.round()}';
+                                  promotionFound = true;
+                                  break;
 
-                                promotionDiscount = '$percentageDiscount';
-
-                                promotionFound = true;
-                                break;
-
+                                }
                               }
                             }
+
+                            promotionIndex++;
                           }
 
-                          promotionIndex++;
-                        }
-
-                        servicePrice = snapshot.data![0]['$currentShopIndex']['services']['$index']['service-price'];
+                          servicePrice = snapshot.data![0]['$currentShopIndex']['services']['$index']['service-price'];
 
 
-                        // CHECKS IF CURRENT SERVICE IS IN MEMBERSHIP
+                          // CHECKS IF CURRENT SERVICE IS IN MEMBERSHIP
 
-                        int membershipIdx = 0;
+                          int membershipIdx = 0;
 
-                        bool isInMembership = false;
-                        bool isDiscounted = false;
+                          bool isInMembership = false;
+                          bool isDiscounted = false;
 
 
-                        while(membershipIdx < membershipServices.length){
+                          while(membershipIdx < membershipServices.length){
 
-                          if(membershipServices[membershipIdx] == snapshot.data![0]['$currentShopIndex']['services']['$index']['service-name']){
-                            isInMembership = true;
-                            break;
+                            if(membershipServices[membershipIdx] == snapshot.data![0]['$currentShopIndex']['services']['$index']['service-name']){
+                              isInMembership = true;
+                              break;
+                            }
+                            membershipIdx++;
                           }
-                          membershipIdx++;
-                        }
 
 
-                        int discountedIndex = 0;
-                        while(discountedIndex < discountedServices.length){
+                          int discountedIndex = 0;
+                          while(discountedIndex < discountedServices.length){
 
-                          if(discountedServices[discountedIndex] == snapshot.data![0]['$currentShopIndex']['services']['$index']['service-name']){
-                            isDiscounted = true;
-                            break;
+                            if(discountedServices[discountedIndex] == snapshot.data![0]['$currentShopIndex']['services']['$index']['service-name']){
+                              isDiscounted = true;
+                              break;
+                            }
+                            discountedIndex++;
+
                           }
-                          discountedIndex++;
-
-                        }
 
 
 
-                        return ServiceTile(
+                          return ServiceTile(
                             snapshot.data![0]['$currentShopIndex']['services']['$index']['service-name'].toString(),
                             servicePrice,
                             discountedPrice,
@@ -515,19 +526,120 @@ class _CurrentShopState extends State<CurrentShop> {
                             snapshot.data![0]['$currentShopIndex']['services']['$index']['members-only'],
                             userIsMember,
                             snapshot.data![0]['$currentShopIndex']['services']['$index']['requires-confirmation'],
-                        );
-                      },
-                    ),
-                  );
+                          );
+                        },
+                      ),
+                    );
+                  }
                 }
-              }
-              return (const Center(
-                child: CircularProgressIndicator(),
-              ));            },
+                return (const Center(
+                  child: CircularProgressIndicator(),
+                ));            },
 
-          ),
-        ],
-      );
+            ),
+          ],
+        );
+      }
+      else{
+        return Column(
+          children: [
+            Text('Party size', style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),),
+            SizedBox(height: 30,),
+
+
+            FutureBuilder(
+              future: categoryData(),
+              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                if(snapshot.connectionState == ConnectionState.done){
+                  if(snapshot.hasError){
+                    return const Text('There is an error');
+                  }
+                  else if(snapshot.hasData){
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(30),
+                            border: Border.all(color: Colors.deepPurple,width: 2),
+                          ),
+                          child: IconButton(
+                            color: Colors.deepPurple,
+                            icon: Icon(Icons.remove),
+                            onPressed: (){
+                              if(numberOfPeople > 1){
+                                setState(() {
+                                  numberOfPeople--;
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                        SizedBox(width: 10,),
+                        Text('$numberOfPeople ${numberOfPeople == 1?'person':'people'}',style: TextStyle(
+                          fontSize: 18,
+                        ),),
+                        SizedBox(width: 10,),
+                        Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(30),
+                            border: Border.all(color: Colors.deepPurple,width: 2),
+                          ),
+                          child: IconButton(
+                            color: Colors.deepPurple,
+                            icon: Icon(Icons.add,),
+                            onPressed: (){
+                              if(numberOfPeople < snapshot.data['$currentShopIndex']['max-customer-amount']){
+                                setState(() {
+                                  numberOfPeople++;
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                }
+                return const CircularProgressIndicator();
+              },
+
+            ),
+
+            SizedBox(height: 30,),
+
+            Container(
+              width: 300,
+              height: 50,
+              decoration: BoxDecoration(
+                color: Colors.deepPurple,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: TextButton(
+                onPressed: (){
+
+
+                  Navigator.pushNamed(context, '/bookingscreen');
+
+                },
+                child: Text('Check Timings', style: TextStyle(
+                  color: Colors.white,
+                ),),
+              ),
+            ),
+
+          ],
+        );
+      }
     }
     else if(tabSelected == 'Packages'){
 
@@ -579,24 +691,24 @@ class _CurrentShopState extends State<CurrentShop> {
                       itemBuilder: (context, index){
                         //return ServiceTile(serviceList[index], index);
                         return ServiceTile(
-                            snapshot.data!['$currentShopIndex']['packages']['$index']['package-name'].toString(),
-                            snapshot.data!['$currentShopIndex']['packages']['$index']['package-price'].toString(),
-                            'discountedPrice',
-                            '0',
-                            snapshot.data!['$currentShopIndex']['packages']['$index']['package-hours'].toString(),
-                            snapshot.data!['$currentShopIndex']['packages']['$index']['package-minutes'].toString(),
-                            snapshot.data!['$currentShopIndex']['packages']['$index']['service-linked'],
-                            false,
-                            snapshot.data!['$currentShopIndex']['packages']['$index']['minute-gap'],
-                            snapshot.data!['$currentShopIndex']['packages']['$index']['max-amount-per-timing'].toString(),
-                            index,
-                            false,
-                            false,
-                            0,
-                            [],
-                            snapshot.data![0]['$currentShopIndex']['services']['$index']['members-only'],
-                            userIsMember,
-                            snapshot.data![0]['$currentShopIndex']['services']['$index']['requires-confirmation'],
+                          snapshot.data!['$currentShopIndex']['packages']['$index']['package-name'].toString(),
+                          snapshot.data!['$currentShopIndex']['packages']['$index']['package-price'].toString(),
+                          'discountedPrice',
+                          '0',
+                          snapshot.data!['$currentShopIndex']['packages']['$index']['package-hours'].toString(),
+                          snapshot.data!['$currentShopIndex']['packages']['$index']['package-minutes'].toString(),
+                          snapshot.data!['$currentShopIndex']['packages']['$index']['service-linked'],
+                          false,
+                          snapshot.data!['$currentShopIndex']['packages']['$index']['minute-gap'],
+                          snapshot.data!['$currentShopIndex']['packages']['$index']['max-amount-per-timing'].toString(),
+                          index,
+                          false,
+                          false,
+                          0,
+                          [],
+                          snapshot.data![0]['$currentShopIndex']['services']['$index']['members-only'],
+                          userIsMember,
+                          snapshot.data![0]['$currentShopIndex']['services']['$index']['requires-confirmation'],
                         );
                       },
                     ),
@@ -678,14 +790,14 @@ class _CurrentShopState extends State<CurrentShop> {
                       itemBuilder: (context, index){
 
                         return MembershipTile(
-                            snapshot.data![0]['$currentShopIndex']['memberships']['$index']['name'],
-                            snapshot.data![0]['$currentShopIndex']['memberships']['$index']['price'],
-                            snapshot.data![0]['$currentShopIndex']['memberships']['$index']['duration'],
-                            snapshot.data![0]['$currentShopIndex']['memberships']['$index']['selected-services'],
-                            snapshot.data![0]['$currentShopIndex']['services']['$index']['selected-discounted-services'],
-                            index,
-                            userIsMember,
-                            userMembershipName,
+                          snapshot.data![0]['$currentShopIndex']['memberships']['$index']['name'],
+                          snapshot.data![0]['$currentShopIndex']['memberships']['$index']['price'],
+                          snapshot.data![0]['$currentShopIndex']['memberships']['$index']['duration'],
+                          snapshot.data![0]['$currentShopIndex']['memberships']['$index']['selected-services'],
+                          snapshot.data![0]['$currentShopIndex']['services']['$index']['selected-discounted-services'],
+                          index,
+                          userIsMember,
+                          userMembershipName,
 
                         );
                       },
@@ -761,45 +873,45 @@ class _CurrentShopState extends State<CurrentShop> {
                             itemCount: snapshot.data!['$currentShopIndex']['reviews-amount']+1,
                             itemBuilder: (context,index){
                               return Container(
-                                width: MediaQuery.of(context).size.width,
-                                height: 200,
-                                margin: EdgeInsets.all(10),
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  elevation: 5.0,
-                                  child: Stack(
-                                    children: [
-                                      Positioned(
-                                        child: Column(
-                                          children: [
-                                            Text(snapshot.data['$currentShopIndex']['reviews']['$index']['user'],style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
-                                            ),),
+                                  width: MediaQuery.of(context).size.width,
+                                  height: 200,
+                                  margin: EdgeInsets.all(10),
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    elevation: 5.0,
+                                    child: Stack(
+                                      children: [
+                                        Positioned(
+                                          child: Column(
+                                            children: [
+                                              Text(snapshot.data['$currentShopIndex']['reviews']['$index']['user'],style: TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                              ),),
 
-                                            SizedBox(height: 25,),
-                                            Text("Review", style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                            ),),
-                                            SizedBox(height: 5,),
-                                            Container(
-                                              width: MediaQuery.of(context).size.width * 0.8,
-                                              child: Text("${snapshot.data['$currentShopIndex']['reviews']['$index']['comment']}", style: TextStyle(
-                                                fontSize: 16,
+                                              SizedBox(height: 25,),
+                                              Text("Review", style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),),
+                                              SizedBox(height: 5,),
+                                              Container(
+                                                width: MediaQuery.of(context).size.width * 0.8,
+                                                child: Text("${snapshot.data['$currentShopIndex']['reviews']['$index']['comment']}", style: TextStyle(
+                                                  fontSize: 16,
+                                                ),
+                                                ),
                                               ),
-                                              ),
-                                            ),
-                                          ],
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                            ],
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                          ),
+                                          top: 20,
+                                          left: 20,
                                         ),
-                                        top: 20,
-                                        left: 20,
-                                      ),
 
-                                      Positioned(
+                                        Positioned(
                                           child: Row(
                                             children: <Widget>[
                                               Icon(
@@ -821,15 +933,15 @@ class _CurrentShopState extends State<CurrentShop> {
 
                                             ],
                                           ),
-                                        top: 20,
-                                        right: 20,
-                                      ),
-                                    ],
-                                  ),
-                                )
+                                          top: 20,
+                                          right: 20,
+                                        ),
+                                      ],
+                                    ),
+                                  )
                               );
 
-                        })
+                            })
                     ),
 
                   ],
@@ -913,8 +1025,8 @@ class _CurrentShopState extends State<CurrentShop> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("Address",style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold
                     ),),
                     SizedBox(height: 10,),
                     Text("${snapshot.data['$currentShopIndex']['shop-address']}",style: TextStyle(
@@ -1058,8 +1170,6 @@ class ServiceTile extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
 
-          VerticalDivider(color: Colors.blue,thickness: 2.0,),
-
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -1137,7 +1247,7 @@ class ServiceTile extends StatelessWidget {
                 fontSize: 15,
                 color: Colors.deepOrange,
               ),):Container(),
-              
+
 
             ],
           ),

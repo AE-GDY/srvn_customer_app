@@ -290,6 +290,7 @@ class DatabaseService{
           '$appointmentIndex': {
             'pending-confirmation': pendingConfirmation,
             'appointment-status':true,
+            'declined': false,
             'date-booked': dateBooked,
             'service-booked': serviceBooked,
             'place-booked': placeBooked,

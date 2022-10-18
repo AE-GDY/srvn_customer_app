@@ -672,6 +672,15 @@ class _HomeState extends State<Home> {
                                       onGymShop = true;
                                     });
                                   }
+                                  else if(category.title == "Restaurants"){
+                                    setState(() {
+                                      currentCategory = "Restaurants";
+                                      onBarberShop = false;
+                                      onSpaShop = false;
+                                      onSaloonShop = false;
+                                      onGymShop = true;
+                                    });
+                                  }
 
                                   Navigator.pushNamed(context, '/shoplist');
                                 },

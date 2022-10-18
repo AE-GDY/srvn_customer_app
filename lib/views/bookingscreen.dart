@@ -139,7 +139,7 @@ class _BarberTimeState extends State<BarberTime> {
                     String to = "";
                     int minuteGap = 0;
 
-                    if (globalServiceLinked) {
+                    if (globalServiceLinked || currentCategory == 'Restaurants') {
                       from = snapshot.data['$currentShopIndex']['business-hours'][currentDayOfWeek]['from'];
                       to = snapshot.data['$currentShopIndex']['business-hours'][currentDayOfWeek]['to'];
                     }
@@ -157,7 +157,14 @@ class _BarberTimeState extends State<BarberTime> {
                       to = snapshot.data['$currentShopIndex']['staff-members']['$employeeIndex']['member-timings'][currentDayOfWeek]['to'];
                     }
 
-                    minuteGap = snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['minute-gap'];
+
+                    if(currentCategory == 'Restaurants'){
+                      minuteGap = int.parse(snapshot.data['$currentShopIndex']['restaurant-minute-gap']);
+                    }
+                    else{
+                      minuteGap = snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['minute-gap'];
+                    }
+
 
                     currentMinuteGap = minuteGap;
 
@@ -252,7 +259,7 @@ class _BarberTimeState extends State<BarberTime> {
                                     String to = "";
                                     int minuteGap = 0;
 
-                                    if (globalServiceLinked) {
+                                    if (globalServiceLinked || currentCategory == 'Restaurants') {
                                       from = snapshot.data['$currentShopIndex']['business-hours'][currentDayOfWeek]['from'];
                                       to = snapshot.data['$currentShopIndex']['business-hours'][currentDayOfWeek]['to'];
                                     }
@@ -270,7 +277,13 @@ class _BarberTimeState extends State<BarberTime> {
                                       to = snapshot.data['$currentShopIndex']['staff-members']['$employeeIndex']['member-timings'][currentDayOfWeek]['to'];
                                     }
 
-                                    minuteGap = snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['minute-gap'];
+                                    if(currentCategory == 'Restaurants'){
+                                      minuteGap = snapshot.data['$currentShopIndex']['restaurant-minute-gap'];
+                                    }
+                                    else{
+                                      minuteGap = snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['minute-gap'];
+                                    }
+
                                     currentMinuteGap = minuteGap;
 
 
@@ -546,30 +559,8 @@ class _BarberTimeState extends State<BarberTime> {
                                       }
                                       else if(snapshot.hasData){
 
-                                        if(snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['both'] == false && snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['cash'] == true){
-                                          cashSelected = true;
-
-                                          return Container(
-                                            margin: EdgeInsets.only(right: 10),
-                                            child: TextButton(
-                                              onPressed: (){
-
-                                              },
-                                              child: ListTile(
-                                                leading: Icon(Icons.money_rounded,color: Colors.green,),
-                                                title: Text('Cash'),
-                                              ),
-                                            ),
-                                          );
-                                        }
-
-                                        else if(nothingSelected){
-
-                                          if(snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['both'] || snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['cash']){
-
-
-                                            print('BOTH OR CASH');
-
+                                        if(currentCategory == 'Restaurants'){
+                                          if(snapshot.data['$currentShopIndex']['both'] == false && snapshot.data['$currentShopIndex']['cash'] == true){
                                             cashSelected = true;
 
                                             return Container(
@@ -577,23 +568,24 @@ class _BarberTimeState extends State<BarberTime> {
                                               child: TextButton(
                                                 onPressed: (){
 
-                                                  if(loggedIn){
-                                                    Navigator.pushNamed(context, '/payment-methods');
-                                                  }
-                                                  else{
-                                                    Navigator.pushNamed(context, '/login');
-                                                  }
                                                 },
                                                 child: ListTile(
                                                   leading: Icon(Icons.money_rounded,color: Colors.green,),
                                                   title: Text('Cash'),
-                                                  trailing: Icon(Icons.arrow_downward,color: Colors.black,),
                                                 ),
                                               ),
                                             );
                                           }
-                                          else{
-                                            if(cashSelected){
+
+                                          else if(nothingSelected){
+
+                                            if(snapshot.data['$currentShopIndex']['both'] || snapshot.data['$currentShopIndex']['cash']){
+
+
+                                              print('BOTH OR CASH');
+
+                                              cashSelected = true;
+
                                               return Container(
                                                 margin: EdgeInsets.only(right: 10),
                                                 child: TextButton(
@@ -605,7 +597,6 @@ class _BarberTimeState extends State<BarberTime> {
                                                     else{
                                                       Navigator.pushNamed(context, '/login');
                                                     }
-
                                                   },
                                                   child: ListTile(
                                                     leading: Icon(Icons.money_rounded,color: Colors.green,),
@@ -616,7 +607,75 @@ class _BarberTimeState extends State<BarberTime> {
                                               );
                                             }
                                             else{
+                                              if(cashSelected){
+                                                return Container(
+                                                  margin: EdgeInsets.only(right: 10),
+                                                  child: TextButton(
+                                                    onPressed: (){
 
+                                                      if(loggedIn){
+                                                        Navigator.pushNamed(context, '/payment-methods');
+                                                      }
+                                                      else{
+                                                        Navigator.pushNamed(context, '/login');
+                                                      }
+
+                                                    },
+                                                    child: ListTile(
+                                                      leading: Icon(Icons.money_rounded,color: Colors.green,),
+                                                      title: Text('Cash'),
+                                                      trailing: Icon(Icons.arrow_downward,color: Colors.black,),
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                              else{
+
+                                                return Container(
+                                                  margin: EdgeInsets.only(right: 30),
+                                                  child: TextButton(
+                                                    onPressed: (){
+                                                      if(loggedIn){
+                                                        Navigator.pushNamed(context, '/payment-methods');
+                                                      }
+                                                      else{
+                                                        Navigator.pushNamed(context, '/login');
+                                                      }
+                                                    },
+                                                    child: ListTile(
+                                                      leading: Icon(Icons.credit_card ,color: Colors.blue,),
+                                                      title: savedCreditCards.length > 0?Text(savedCreditCards[0].nickname):Text('No Credit Card Added'),
+                                                      trailing: Icon(Icons.arrow_right,color:Colors.black,),
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+
+                                            }
+                                          }
+                                          else{
+
+                                            if(cashSelected){
+                                              return Container(
+                                                margin: EdgeInsets.only(right: 10),
+                                                child: TextButton(
+                                                  onPressed: (){
+                                                    if(loggedIn){
+                                                      Navigator.pushNamed(context, '/payment-methods');
+                                                    }
+                                                    else{
+                                                      Navigator.pushNamed(context, '/login');
+                                                    }
+                                                  },
+                                                  child: ListTile(
+                                                    leading: Icon(Icons.money_rounded,color: Colors.green,),
+                                                    title: Text('Cash'),
+                                                    trailing: Icon(Icons.arrow_downward,color: Colors.black,),
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                            else{
                                               return Container(
                                                 margin: EdgeInsets.only(right: 30),
                                                 child: TextButton(
@@ -630,56 +689,150 @@ class _BarberTimeState extends State<BarberTime> {
                                                   },
                                                   child: ListTile(
                                                     leading: Icon(Icons.credit_card ,color: Colors.blue,),
-                                                    title: savedCreditCards.length > 0?Text(savedCreditCards[0].nickname):Text('No Credit Card Added'),
+                                                    title: Text(cardSelected!.nickname),
                                                     trailing: Icon(Icons.arrow_right,color:Colors.black,),
                                                   ),
                                                 ),
                                               );
                                             }
-
                                           }
                                         }
                                         else{
+                                          if(snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['both'] == false && snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['cash'] == true){
+                                            cashSelected = true;
 
-                                          if(cashSelected){
                                             return Container(
                                               margin: EdgeInsets.only(right: 10),
                                               child: TextButton(
                                                 onPressed: (){
-                                                  if(loggedIn){
-                                                    Navigator.pushNamed(context, '/payment-methods');
-                                                  }
-                                                  else{
-                                                    Navigator.pushNamed(context, '/login');
-                                                  }
+
                                                 },
                                                 child: ListTile(
                                                   leading: Icon(Icons.money_rounded,color: Colors.green,),
                                                   title: Text('Cash'),
-                                                  trailing: Icon(Icons.arrow_downward,color: Colors.black,),
                                                 ),
                                               ),
                                             );
                                           }
-                                          else{
-                                            return Container(
-                                              margin: EdgeInsets.only(right: 30),
-                                              child: TextButton(
-                                                onPressed: (){
-                                                  if(loggedIn){
-                                                    Navigator.pushNamed(context, '/payment-methods');
-                                                  }
-                                                  else{
-                                                    Navigator.pushNamed(context, '/login');
-                                                  }
-                                                },
-                                                child: ListTile(
-                                                  leading: Icon(Icons.credit_card ,color: Colors.blue,),
-                                                  title: Text(cardSelected!.nickname),
-                                                  trailing: Icon(Icons.arrow_right,color:Colors.black,),
+
+                                          else if(nothingSelected){
+
+                                            if(snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['both'] || snapshot.data['$currentShopIndex']['services']['$currentServiceIndex']['cash']){
+
+
+                                              print('BOTH OR CASH');
+
+                                              cashSelected = true;
+
+                                              return Container(
+                                                margin: EdgeInsets.only(right: 10),
+                                                child: TextButton(
+                                                  onPressed: (){
+
+                                                    if(loggedIn){
+                                                      Navigator.pushNamed(context, '/payment-methods');
+                                                    }
+                                                    else{
+                                                      Navigator.pushNamed(context, '/login');
+                                                    }
+                                                  },
+                                                  child: ListTile(
+                                                    leading: Icon(Icons.money_rounded,color: Colors.green,),
+                                                    title: Text('Cash'),
+                                                    trailing: Icon(Icons.arrow_downward,color: Colors.black,),
+                                                  ),
                                                 ),
-                                              ),
-                                            );
+                                              );
+                                            }
+                                            else{
+                                              if(cashSelected){
+                                                return Container(
+                                                  margin: EdgeInsets.only(right: 10),
+                                                  child: TextButton(
+                                                    onPressed: (){
+
+                                                      if(loggedIn){
+                                                        Navigator.pushNamed(context, '/payment-methods');
+                                                      }
+                                                      else{
+                                                        Navigator.pushNamed(context, '/login');
+                                                      }
+
+                                                    },
+                                                    child: ListTile(
+                                                      leading: Icon(Icons.money_rounded,color: Colors.green,),
+                                                      title: Text('Cash'),
+                                                      trailing: Icon(Icons.arrow_downward,color: Colors.black,),
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                              else{
+
+                                                return Container(
+                                                  margin: EdgeInsets.only(right: 30),
+                                                  child: TextButton(
+                                                    onPressed: (){
+                                                      if(loggedIn){
+                                                        Navigator.pushNamed(context, '/payment-methods');
+                                                      }
+                                                      else{
+                                                        Navigator.pushNamed(context, '/login');
+                                                      }
+                                                    },
+                                                    child: ListTile(
+                                                      leading: Icon(Icons.credit_card ,color: Colors.blue,),
+                                                      title: savedCreditCards.length > 0?Text(savedCreditCards[0].nickname):Text('No Credit Card Added'),
+                                                      trailing: Icon(Icons.arrow_right,color:Colors.black,),
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+
+                                            }
+                                          }
+                                          else{
+
+                                            if(cashSelected){
+                                              return Container(
+                                                margin: EdgeInsets.only(right: 10),
+                                                child: TextButton(
+                                                  onPressed: (){
+                                                    if(loggedIn){
+                                                      Navigator.pushNamed(context, '/payment-methods');
+                                                    }
+                                                    else{
+                                                      Navigator.pushNamed(context, '/login');
+                                                    }
+                                                  },
+                                                  child: ListTile(
+                                                    leading: Icon(Icons.money_rounded,color: Colors.green,),
+                                                    title: Text('Cash'),
+                                                    trailing: Icon(Icons.arrow_downward,color: Colors.black,),
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                            else{
+                                              return Container(
+                                                margin: EdgeInsets.only(right: 30),
+                                                child: TextButton(
+                                                  onPressed: (){
+                                                    if(loggedIn){
+                                                      Navigator.pushNamed(context, '/payment-methods');
+                                                    }
+                                                    else{
+                                                      Navigator.pushNamed(context, '/login');
+                                                    }
+                                                  },
+                                                  child: ListTile(
+                                                    leading: Icon(Icons.credit_card ,color: Colors.blue,),
+                                                    title: Text(cardSelected!.nickname),
+                                                    trailing: Icon(Icons.arrow_right,color:Colors.black,),
+                                                  ),
+                                                ),
+                                              );
+                                            }
                                           }
                                         }
                                       }
@@ -695,7 +848,35 @@ class _BarberTimeState extends State<BarberTime> {
                                 Row(
                                   children: [
 
-                                    Container(
+                                    currentCategory == 'Restaurants'?
+                                    FutureBuilder(
+                                      future: categoryData(),
+                                      builder: (BuildContext context, AsyncSnapshot<Map<String, dynamic>?> snapshot) {
+                                        if(snapshot.connectionState == ConnectionState.done){
+                                          if(snapshot.hasError){
+                                            return const Text("There is an error");
+                                          }
+                                          else if(snapshot.hasData){
+                                            return Container(
+                                              width: MediaQuery.of(context).size.width / 2.5,
+                                              height: 50,
+                                              margin: EdgeInsets.all(5),
+                                              child: ListTile(
+                                                title: snapshot.data!['$currentShopIndex']['down-payment']?
+                                                Text('${snapshot.data!['$currentShopIndex']['down-payment-amount']} EGP',style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold
+                                                ),):Text("No Payment"),
+                                                subtitle: Text('Down Payment', style: TextStyle(
+                                              ),),
+                                              ),
+                                            );
+                                          }
+                                        }
+                                        return const Text("Please wait");
+                                    },
+
+                                    ):Container(
                                       width: MediaQuery.of(context).size.width / 3,
                                       height: 50,
                                       margin: EdgeInsets.all(10),
@@ -1338,7 +1519,7 @@ class _BarberTimeState extends State<BarberTime> {
 
 
   Widget buildStaffMembers(AsyncSnapshot<dynamic> snapshot) {
-    if (globalServiceLinked) {
+    if (globalServiceLinked || currentCategory == 'Restaurants') {
       return Container();
     }
     else {

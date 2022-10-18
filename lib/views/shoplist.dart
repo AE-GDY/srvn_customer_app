@@ -332,6 +332,9 @@ class _shopListState extends State<shopList> {
               return const Text("There is an error");
             }
             else if(snapshot.hasData){
+
+              print('current category: $currentCategory');
+
               return Container(
                 width: MediaQuery.of(context).size.width,
                 child: ListView.builder(

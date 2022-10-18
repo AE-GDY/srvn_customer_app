@@ -100,6 +100,7 @@ class _AppointmentListState extends State<AppointmentList> {
                         }
 
 
+                        print('here');
 
 
                         if(snapshot.data['$userLoggedInIndex']['appointments']['$index']['appointment-status'] == false){
